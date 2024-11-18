@@ -1,4 +1,4 @@
-# cl-book-service
+# cl-user-service
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
