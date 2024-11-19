@@ -1,8 +1,7 @@
-package at.aau.ase.cl.api.model;
+package at.aau.ase.cl.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
@@ -12,7 +11,7 @@ public class AddressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    public UUID id;
 
     @NotNull
     @Column(name = "street", nullable = false)
