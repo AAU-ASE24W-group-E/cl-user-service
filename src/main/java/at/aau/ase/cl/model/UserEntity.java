@@ -1,7 +1,5 @@
 package at.aau.ase.cl.model;
 
-import at.aau.ase.cl.api.model.Address;
-import at.aau.ase.cl.api.model.AddressEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
