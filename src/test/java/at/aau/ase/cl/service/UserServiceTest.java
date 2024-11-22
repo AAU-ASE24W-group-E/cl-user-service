@@ -22,6 +22,8 @@ class UserServiceTest {
         user.address = null;
         user.firstName = "first name";
         user.lastName = "last name";
+        user.email = "email1";
+        user.username = "username1";
 
         UserEntity createdUser = userService.createUser(user);
 
@@ -29,6 +31,8 @@ class UserServiceTest {
         assertNull(createdUser.address);
         assertEquals(user.firstName, createdUser.firstName);
         assertEquals(user.lastName, createdUser.lastName);
+        assertEquals(user.email, createdUser.email);
+        assertEquals(user.username, createdUser.username);
         assertNotNull(createdUser.id);
     }
 
@@ -39,6 +43,8 @@ class UserServiceTest {
         user.address = null;
         user.firstName = "first name";
         user.lastName = "last name";
+        user.email = "email2";
+        user.username = "username2";
 
         UserEntity createdUser = userService.createUser(user);
         assertNotNull(createdUser);

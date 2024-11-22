@@ -15,6 +15,9 @@ public class UserService {
     @Transactional
     public UserEntity createUser(UserEntity user) {
         // create user
+        if (UserEntity.find("email", user.email).firstResult() != null) {
+            throw new IllegalArgumentException("A user with this email already exists: " + user.email);
+        }
         user.persist();
         return user;
     }
@@ -50,4 +53,5 @@ public class UserService {
         Log.debugf("Added address %s to User with id %s found: %s", address, userId);
         return user;
     }
+
 }

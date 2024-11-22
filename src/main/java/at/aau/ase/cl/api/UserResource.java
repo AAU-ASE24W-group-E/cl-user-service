@@ -23,7 +23,6 @@ public class UserResource {
     @POST
     @Path("user")
     public Response createUser(User user) {
-        // create user
         var model = UserMapper.INSTANCE.map(user);
         model = service.createUser(model);
         var result = UserMapper.INSTANCE.map(model);

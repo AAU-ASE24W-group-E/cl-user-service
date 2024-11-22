@@ -20,6 +20,12 @@ public class UserEntity extends PanacheEntityBase {
     @Column(name = "last_name", nullable = false)
     public String lastName;
 
+    @Column(name = "email", nullable = false, unique = true)
+    public String email;
+
+    @Column(name = "username", nullable = false, unique = true)
+    public String username;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     public AddressEntity address;
@@ -27,5 +33,12 @@ public class UserEntity extends PanacheEntityBase {
     public List<UserEntity> findByUserId(UUID userId) {
 
         return find("userId", Sort.by("title"), userId).list();
+    }
+
+    /**
+     * @param identifier either email or username as both are unique
+     */
+    public static UserEntity findByIdentifier(String identifier) {
+        return find("email = ?1 or username = ?1", identifier).firstResult();
     }
 }
