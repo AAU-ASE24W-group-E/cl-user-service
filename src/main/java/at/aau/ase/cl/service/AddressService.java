@@ -1,7 +1,6 @@
 package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.model.AddressEntity;
-import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;

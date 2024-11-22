@@ -1,11 +1,8 @@
 package at.aau.ase.cl.api;
 
 import at.aau.ase.cl.api.model.Address;
-import at.aau.ase.cl.api.model.User;
 import at.aau.ase.cl.mapper.AddressMapper;
-import at.aau.ase.cl.mapper.UserMapper;
 import at.aau.ase.cl.service.AddressService;
-import at.aau.ase.cl.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
