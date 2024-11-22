@@ -1,5 +1,6 @@
 package at.aau.ase.cl.service;
 
+import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -10,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 class UserServiceTest {
+
     @Inject
-    private UserService userService;
+    UserService userService;
 
     @Test
     @Transactional
     public void testCreateUser() {
         UserEntity user = new UserEntity();
-
         user.address = null;
         user.firstName = "first name";
         user.lastName = "last name";
@@ -26,9 +27,38 @@ class UserServiceTest {
 
         assertNotNull(createdUser);
         assertNull(createdUser.address);
-        assertNotNull(createdUser.firstName, user.firstName);
-        assertNotNull(createdUser.lastName, user.lastName);
-        assertNotNull(user.id);
+        assertEquals(user.firstName, createdUser.firstName);
+        assertEquals(user.lastName, createdUser.lastName);
+        assertNotNull(createdUser.id);
     }
 
+    @Test
+    @Transactional
+    public void testAddAddressToUser() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.firstName = "first name";
+        user.lastName = "last name";
+
+        UserEntity createdUser = userService.createUser(user);
+        assertNotNull(createdUser);
+        assertNull(createdUser.address);
+
+        AddressEntity address = new AddressEntity();
+        address.id = null;
+        address.street = "Street";
+        address.city = "City";
+        address.postalCode = "9020";
+        address.country = "Country";
+
+        UserEntity userWithAddress = userService.addAddressToUser(createdUser.id, address);
+
+        assertNotNull(userWithAddress);
+        assertNotNull(userWithAddress.address);
+        assertEquals(address.id, userWithAddress.address.id);
+        assertEquals("Street", userWithAddress.address.street);
+        assertEquals("City", userWithAddress.address.city);
+        assertEquals("9020", userWithAddress.address.postalCode);
+        assertEquals("Country", userWithAddress.address.country);
+    }
 }
