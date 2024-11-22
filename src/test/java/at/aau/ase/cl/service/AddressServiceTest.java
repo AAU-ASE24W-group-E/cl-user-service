@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 class AddressServiceTest {
+
     @Inject
     AddressService addressService;
 
