@@ -3,11 +3,14 @@ package at.aau.ase.cl.model;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "address")
+@Getter @Setter
 public class AddressEntity extends PanacheEntityBase {
 
     @Id
