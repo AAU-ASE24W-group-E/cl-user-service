@@ -11,6 +11,7 @@ import java.util.UUID;
 @Table(name = "users") //user table may be already in use
 public class UserEntity extends PanacheEntityBase {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
 
     @Column(name = "first_name", nullable = false)
