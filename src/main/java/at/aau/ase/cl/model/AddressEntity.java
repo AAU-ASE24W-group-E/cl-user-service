@@ -1,17 +1,22 @@
 package at.aau.ase.cl.model;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "address")
-public class AddressEntity {
+@Getter @Setter
+public class AddressEntity extends PanacheEntityBase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
+
 
     @NotNull
     @Column(name = "street", nullable = false)
