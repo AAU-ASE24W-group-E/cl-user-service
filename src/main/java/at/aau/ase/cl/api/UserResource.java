@@ -1,13 +1,13 @@
 package at.aau.ase.cl.api;
 
+import at.aau.ase.cl.api.model.Address;
 import at.aau.ase.cl.api.model.User;
+import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.mapper.UserMapper;
 import at.aau.ase.cl.service.UserService;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -38,5 +38,19 @@ public class UserResource {
         var model = service.getUserById(id);
         var result = UserMapper.INSTANCE.map(model);
         return Response.ok(result).build();
+    }
+
+    @POST
+    @Path("user/{id}/address")
+    public Response addAddressToUser(@PathParam("id") UUID id, @Valid Address address) {
+        var modelAddress = AddressMapper.INSTANCE.map(address);
+
+        try{
+            var modelUser = service.addAddressToUser(id, modelAddress);
+            var result = UserMapper.INSTANCE.map(modelUser);
+            return Response.ok(result).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User with ID " + id + " not found").build();
+        }
     }
 }
