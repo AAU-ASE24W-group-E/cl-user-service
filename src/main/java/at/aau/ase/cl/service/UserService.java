@@ -4,21 +4,28 @@ import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.UUID;
 
+@Slf4j
 @ApplicationScoped
 public class UserService {
 
     @Transactional
     public UserEntity createUser(UserEntity user) {
-        // create user
-        if (UserEntity.find("email", user.email).firstResult() != null) {
-            throw new IllegalArgumentException("A user with this email already exists: " + user.email);
+        try {
+            user.persistAndFlush();
+        } catch (PersistenceException e) {
+            if (e.getCause() instanceof ConstraintViolationException) {
+                throw new IllegalArgumentException("A user with this email already exists: " + user.email, e);
+            }
+            throw e;
         }
-        user.persist();
         return user;
     }
 
