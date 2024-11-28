@@ -6,11 +6,8 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.UUID;
 
 public class Address {
-    public UUID id;
-
     @Size(min = 1, max = 255)
     @NotNull
     public String street;
@@ -35,10 +32,10 @@ public class Address {
         this.city = city;
         this.postalCode = postalCode;
         this.countryCode = countryCode;
-        validateCountriCode(this.countryCode);
+        validateCountryCode(this.countryCode);
     }
 
-    public void validateCountriCode(String countryCode) {
+    public void validateCountryCode(String countryCode) {
         if (Arrays.stream(Locale.getISOCountries()).noneMatch(loc -> loc.equalsIgnoreCase(countryCode))) {
             throw new IllegalArgumentException("Invalid Country Code");
         }

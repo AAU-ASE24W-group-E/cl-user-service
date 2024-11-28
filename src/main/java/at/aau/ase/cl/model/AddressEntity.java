@@ -3,10 +3,7 @@ package at.aau.ase.cl.model;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.UUID;
+import jakarta.validation.constraints.Pattern;
 
 @Embeddable
 public class AddressEntity extends PanacheEntityBase {
@@ -20,6 +17,7 @@ public class AddressEntity extends PanacheEntityBase {
     public String postalCode;
 
     @NotNull
-    public String country;
+    @Pattern(regexp = "^[A-Z]{2}$", message = "Invalid Country Code")
+    public String countryCode;
 
 }
