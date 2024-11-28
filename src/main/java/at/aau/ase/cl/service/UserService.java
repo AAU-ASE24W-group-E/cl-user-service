@@ -12,7 +12,6 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.UUID;
 
-@Slf4j
 @ApplicationScoped
 public class UserService {
 
@@ -22,7 +21,7 @@ public class UserService {
             user.persistAndFlush();
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
-                throw new IllegalArgumentException("A user with this email already exists: " + user.email, e);
+                throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
             }
             throw e;
         }
@@ -48,16 +47,9 @@ public class UserService {
             throw new NotFoundException("User with id " + userId + " not found");
         }
 
-        if(!address.isPersistent()){
-            address.persist();
-            Log.debugf("Address persisted: %s", address);
-        }else {
-            Log.debugf("Address already there: %s", address);
-        }
-
         user.address = address;
-        user.persist();
-        Log.debugf("Added address %s to User with id %s found: %s", address, userId);
+        user.persistAndFlush();
+        Log.debugf("Added address to User with id %s: %s", userId, user);
         return user;
     }
 

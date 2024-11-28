@@ -43,13 +43,8 @@ public class UserResource {
     @Path("user/{id}/address")
     public Response addAddressToUser(@PathParam("id") UUID id, @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
-
-        try{
-            var modelUser = service.addAddressToUser(id, modelAddress);
-            var result = UserMapper.INSTANCE.map(modelUser);
-            return Response.ok(result).build();
-        } catch (NotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("User with ID " + id + " not found").build();
-        }
+        var modelUser = service.addAddressToUser(id, modelAddress);
+        var result = UserMapper.INSTANCE.map(modelUser);
+        return Response.ok(result).build();
     }
 }

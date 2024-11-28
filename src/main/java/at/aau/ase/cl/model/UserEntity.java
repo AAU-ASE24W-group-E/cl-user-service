@@ -26,8 +26,7 @@ public class UserEntity extends PanacheEntityBase {
     @Column(name = "username", nullable = false, unique = true)
     public String username;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    @Embedded
     public AddressEntity address;
 
     public List<UserEntity> findByUserId(UUID userId) {
