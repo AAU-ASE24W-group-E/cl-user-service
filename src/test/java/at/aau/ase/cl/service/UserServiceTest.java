@@ -16,7 +16,6 @@ class UserServiceTest {
     UserService userService;
 
     @Test
-    @Transactional
     public void testCreateUser() {
         UserEntity user = new UserEntity();
         user.address = null;
@@ -37,7 +36,6 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     public void testAddAddressToUser() {
         UserEntity user = new UserEntity();
         user.address = null;
@@ -51,20 +49,18 @@ class UserServiceTest {
         assertNull(createdUser.address);
 
         AddressEntity address = new AddressEntity();
-        address.id = null;
         address.street = "Street";
         address.city = "City";
         address.postalCode = "9020";
-        address.country = "Country";
+        address.countryCode = "AT";
 
         UserEntity userWithAddress = userService.addAddressToUser(createdUser.id, address);
 
         assertNotNull(userWithAddress);
         assertNotNull(userWithAddress.address);
-        assertEquals(address.id, userWithAddress.address.id);
         assertEquals("Street", userWithAddress.address.street);
         assertEquals("City", userWithAddress.address.city);
         assertEquals("9020", userWithAddress.address.postalCode);
-        assertEquals("Country", userWithAddress.address.country);
+        assertEquals("AT", userWithAddress.address.countryCode);
     }
 }
