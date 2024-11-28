@@ -3,6 +3,7 @@ package at.aau.ase.cl.api;
 import at.aau.ase.cl.api.model.Address;
 import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.service.AddressService;
+import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -23,14 +24,13 @@ public class AddressResource {
     @POST
     @Path("address")
     public Response createAddress(Address address) {
-        // create address
-        System.out.println("Request angekommen");
+        Log.debug("Request arrived");
         var model = AddressMapper.INSTANCE.map(address);
-        System.out.println("model gemappt");
+        Log.debug("model mapped");
         model = service.createAddress(model);
-        System.out.println("addresse erstellt");
+        Log.debug("address created");
         var result = AddressMapper.INSTANCE.map(model);
-        System.out.println("result gemappt");
+        Log.debug("result mapped");
         return Response.ok(result).build();
     }
 
