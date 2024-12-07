@@ -10,14 +10,6 @@ public class User {
 
     @Size(min = 1, max = 255)
     @NotNull
-    public String firstName;
-
-    @Size(min = 1, max = 255)
-    @NotNull
-    public String lastName;
-
-    @Size(min = 1, max = 255)
-    @NotNull
     public String email;
 
     @Size(min = 1, max = 255)
@@ -29,9 +21,7 @@ public class User {
     public User() {
     }
 
-    public User( String firstName, String lastName,String email, String username, Address address) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public User( String email, String username, Address address) {
         this.email = email;
         this.username = username;
         this.address = address;

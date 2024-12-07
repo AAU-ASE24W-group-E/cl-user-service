@@ -22,8 +22,6 @@ class UserServiceTest {
     public void testCreateUser() {
         UserEntity user = new UserEntity();
         user.address = null;
-        user.firstName = "first name";
-        user.lastName = "last name";
         user.email = "email1";
         user.username = "username1";
 
@@ -31,8 +29,6 @@ class UserServiceTest {
 
         assertNotNull(createdUser);
         assertNull(createdUser.address);
-        assertEquals(user.firstName, createdUser.firstName);
-        assertEquals(user.lastName, createdUser.lastName);
         assertEquals(user.email, createdUser.email);
         assertEquals(user.username, createdUser.username);
         assertNotNull(createdUser.id);
@@ -42,8 +38,6 @@ class UserServiceTest {
     public void testAddAddressToUser() {
         UserEntity user = new UserEntity();
         user.address = null;
-        user.firstName = "first name";
-        user.lastName = "last name";
         user.email = "email2";
         user.username = "username2";
 
@@ -71,8 +65,6 @@ class UserServiceTest {
     public void testAddUserWhichAlreadyExists() {
         UserEntity user = new UserEntity();
         user.address = null;
-        user.firstName = "first name";
-        user.lastName = "last name";
         user.email = "email3";
         user.username = "username3";
 

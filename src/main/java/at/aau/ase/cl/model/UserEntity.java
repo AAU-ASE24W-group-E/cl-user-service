@@ -14,12 +14,6 @@ public class UserEntity extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
 
-    @Column(name = "first_name", nullable = false)
-    public String firstName;
-
-    @Column(name = "last_name", nullable = false)
-    public String lastName;
-
     @Column(name = "email", nullable = false, unique = true)
     public String email;
 
