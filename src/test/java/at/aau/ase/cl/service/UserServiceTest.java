@@ -5,7 +5,10 @@ import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,5 +65,29 @@ class UserServiceTest {
         assertEquals("City", userWithAddress.address.city);
         assertEquals("9020", userWithAddress.address.postalCode);
         assertEquals("AT", userWithAddress.address.countryCode);
+    }
+
+    @Test
+    public void testAddUserWhichAlreadyExists() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.firstName = "first name";
+        user.lastName = "last name";
+        user.email = "email3";
+        user.username = "username3";
+
+        UserEntity createdUser = userService.createUser(user);
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createdUser));
+    }
+
+
+    @Test
+    public void testGetUserThatDoesNotExist() {
+        assertThrows(NotFoundException.class, () -> userService.getUserById(UUID.randomUUID()));
+    }
+
+    @Test
+    public void testAddressToUserThatDoesNotExist() {
+        assertThrows(NotFoundException.class, () -> userService.addAddressToUser(UUID.randomUUID(), null));
     }
 }

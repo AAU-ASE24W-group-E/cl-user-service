@@ -29,6 +29,8 @@ public class UserEntity extends PanacheEntityBase {
     @Embedded
     public AddressEntity address;
 
+    //TODO: Add Location with Latitude Longitude
+
     public List<UserEntity> findByUserId(UUID userId) {
 
         return find("userId", Sort.by("title"), userId).list();

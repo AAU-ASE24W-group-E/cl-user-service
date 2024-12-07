@@ -114,6 +114,33 @@ class UserResourceTest {
                 .body("address", equalTo(null));
     }
 
+    @Test
+    void addAddressToUser() {
+        User user = new User("john", "doe", "email5@mail.com", "john5", null);
+        Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        given().pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .body(address)
+                .post("/user/{id}/address")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("address.street", equalTo("some street"))
+                .body("address.city", equalTo("Klagenfurt"))
+                .body("address.postalCode", equalTo("9020"))
+                .body("address.countryCode", equalTo("AT"));
+    }
+
     @AfterEach
     void tearDown () {
 

@@ -7,7 +7,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.UUID;
@@ -20,10 +19,7 @@ public class UserService {
         try {
             user.persistAndFlush();
         } catch (PersistenceException e) {
-            if (e.getCause() instanceof ConstraintViolationException) {
-                throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
-            }
-            throw e;
+            throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
         }
         return user;
     }
