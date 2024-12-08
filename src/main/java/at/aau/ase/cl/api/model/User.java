@@ -18,12 +18,17 @@ public class User {
 
     public Address address;
 
+    @Size(min = 8, max = 255)
+    @NotNull
+    public String password;
+
     public User() {
     }
 
-    public User( String email, String username, Address address) {
+    public User( String email, String username, Address address, String password) {
         this.email = email;
         this.username = username;
         this.address = address;
+        this.password = password;
     }
 }

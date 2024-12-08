@@ -2,6 +2,7 @@ package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceException;
@@ -16,6 +17,7 @@ public class UserService {
     @Transactional
     public UserEntity createUser(UserEntity user) {
         try {
+            user.password = BcryptUtil.bcryptHash(user.password);
             user.persistAndFlush();
         } catch (PersistenceException e) {
             throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);

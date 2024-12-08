@@ -2,6 +2,7 @@ package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -24,6 +25,7 @@ class UserServiceTest {
         user.address = null;
         user.email = "email1";
         user.username = "username1";
+        user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
 
@@ -31,6 +33,7 @@ class UserServiceTest {
         assertNull(createdUser.address);
         assertEquals(user.email, createdUser.email);
         assertEquals(user.username, createdUser.username);
+        assertTrue(BcryptUtil.matches("SomePassword", createdUser.password));
         assertNotNull(createdUser.id);
     }
 
@@ -40,6 +43,7 @@ class UserServiceTest {
         user.address = null;
         user.email = "email2";
         user.username = "username2";
+        user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
         assertNotNull(createdUser);
@@ -67,6 +71,7 @@ class UserServiceTest {
         user.address = null;
         user.email = "email3";
         user.username = "username3";
+        user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(createdUser));
