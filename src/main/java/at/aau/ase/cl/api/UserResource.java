@@ -47,4 +47,8 @@ public class UserResource {
         var result = UserMapper.INSTANCE.map(modelUser);
         return Response.ok(result).build();
     }
+
+
+
+
 }

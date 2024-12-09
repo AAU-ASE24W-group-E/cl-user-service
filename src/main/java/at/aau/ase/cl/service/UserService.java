@@ -9,6 +9,7 @@ import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
+import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -18,6 +19,9 @@ public class UserService {
     public UserEntity createUser(UserEntity user) {
         try {
             user.password = BcryptUtil.bcryptHash(user.password);
+            if (user.role == null || user.role.isEmpty()) {
+                user.role = "USER";
+            }
             user.persistAndFlush();
         } catch (PersistenceException e) {
             throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
@@ -38,16 +42,9 @@ public class UserService {
     @Transactional
     public UserEntity addAddressToUser(UUID userId, AddressEntity address) {
         UserEntity user = getUserById(userId);
-
-        if (user == null) {
-            Log.debugf("User with id %s not found", userId);
-            throw new NotFoundException("User with id " + userId + " not found");
-        }
-
         user.address = address;
         user.persistAndFlush();
         Log.debugf("Added address to User with id %s: %s", userId, user);
         return user;
     }
-
 }

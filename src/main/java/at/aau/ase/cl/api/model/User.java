@@ -22,13 +22,16 @@ public class User {
     @NotNull
     public String password;
 
+    public String role;
+
     public User() {
     }
 
-    public User( String email, String username, Address address, String password) {
+    public User(String email, String username, Address address, String password, String role) {
         this.email = email;
         this.username = username;
         this.address = address;
         this.password = password;
+        this.role = role;
     }
 }

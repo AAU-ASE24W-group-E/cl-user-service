@@ -1,43 +1,41 @@
 package at.aau.ase.cl.model;
 
-import io.quarkus.elytron.security.common.BcryptUtil;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Sort;
 import io.quarkus.security.jpa.Password;
 import io.quarkus.security.jpa.Roles;
 import io.quarkus.security.jpa.UserDefinition;
 import io.quarkus.security.jpa.Username;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users") //user table may be already in use
+@UserDefinition
+@Table(name = "users")
 public class UserEntity extends PanacheEntityBase {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
 
+    @Username
+    @Column(name = "username", nullable = false, unique = true)
+    public String username;
+
     @Column(name = "email", nullable = false, unique = true)
     public String email;
 
-    @Column(name = "username", nullable = false, unique = true)
-    public String username;
+    @Password
+    @Column(nullable = false)
+    public String password;
 
     @Embedded
     public AddressEntity address;
 
-    @Column(nullable = false)
-    public String password;
+    @Roles
+    @Column(name = "role", nullable = false)
+    public String role;
 
-
-    //TODO: Add Location with Latitude Longitude
-
-    public List<UserEntity> findByUserId(UUID userId) {
-
-        return find("userId", Sort.by("title"), userId).list();
-    }
 
     /**
      * @param identifier either email or username as both are unique

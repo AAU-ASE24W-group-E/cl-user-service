@@ -6,6 +6,9 @@ quarkus:
   hibernate-orm:
     database:
       generation: none
+  http:
+    auth:
+      basic: true
 
 "%test":
   quarkus:
@@ -16,6 +19,9 @@ quarkus:
     hibernate-orm:
       database:
         generation: drop-and-create
+    http:
+      auth:
+        basic: true
 
 "%dev":
   quarkus:
@@ -26,3 +32,6 @@ quarkus:
     hibernate-orm:
       database:
         generation: drop-and-create
+    http:
+      auth:
+        basic: true
