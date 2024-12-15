@@ -3,7 +3,7 @@ package at.aau.ase.cl.api;
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 
-
+import at.aau.ase.cl.api.model.LoginRequest;
 import at.aau.ase.cl.api.model.User;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -14,6 +14,7 @@ import static org.hamcrest.core.Is.is;
 
 @QuarkusTest
 class UserOnlyResourceTest {
+
     @Test
     void shouldNotAccessUserResourceWhenAnonymous() {
         get("/user-only")
@@ -32,8 +33,24 @@ class UserOnlyResourceTest {
                 .then()
                 .statusCode(200);
 
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.username = "john0";
+        loginRequest.password = "SomePassword";
+
+        String token = given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("token");
+
+        System.out.println("Generated Token: " + token);
+
+
         given()
-                .auth().preemptive().basic("john0", "SomePassword")
+                .header("Authorization", "Bearer " + token)
                 .when()
                 .get("/user-only")
                 .then()

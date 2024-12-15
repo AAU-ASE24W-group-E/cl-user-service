@@ -10,6 +10,7 @@ smallrye:
       key:
         location: "src/main/resources/private.pem"
     verify:
+      issuer: "user-service"
       key:
         location: "src/main/resources/public.pem"
 
@@ -28,6 +29,7 @@ smallrye:
         key:
           location: "src/main/resources/private.pem"
       verify:
+        issuer: "user-service"
         key:
           location: "src/main/resources/public.pem"
 
@@ -46,6 +48,6 @@ smallrye:
         key:
           location: "src/main/resources/private.pem"
       verify:
+        issuer: "user-service"
         key:
           location: "src/main/resources/public.pem"
-
