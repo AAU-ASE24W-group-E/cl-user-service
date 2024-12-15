@@ -47,4 +47,15 @@ public class UserService {
         Log.debugf("Added address to User with id %s: %s", userId, user);
         return user;
     }
+
+    @Transactional
+    public UserEntity findByUsernameOrEmail(String identifier) {
+        UserEntity user = UserEntity.find("email = ?1 or username = ?1", identifier).firstResult();
+        if (user == null) {
+            Log.debugf("User with identifier %s not found", identifier);
+            throw new NotFoundException("User with identifier " + identifier + " not found");
+        }
+        Log.debugf("User with identifier %s found: %s", identifier, user);
+        return user;
+    }
 }

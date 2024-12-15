@@ -1,18 +1,24 @@
 package at.aau.ase.cl.api;
 
 import at.aau.ase.cl.api.model.Address;
+import at.aau.ase.cl.api.model.LoginRequest;
 import at.aau.ase.cl.api.model.User;
+import at.aau.ase.cl.util.JWT_Util;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 class UserResourceTest {
+    @Inject
+    JWT_Util jwtUtil;
 
     @Test
     void createUserWithoutAddress() {
@@ -163,5 +169,48 @@ class UserResourceTest {
                 .path("password");
 
         assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
+    }
+
+
+
+    @Test
+    public void testUserCreationLoginAndTokenValidation() {
+        User user = new User();
+        user.username = "testuser";
+        user.email = "test@example.com";
+        user.password = "password123";
+        user.role = "admin";
+
+        Response createUserResponse = given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        assertNotNull(createUserResponse);
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.username = "testuser";
+        loginRequest.password = "password123";
+
+        String token = given()
+                .contentType("application/json")
+                .body(loginRequest)
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .body("token", notNullValue())
+                .extract()
+                .path("token");
+
+        assertNotNull(token);
+
+        boolean isRoleValid = jwtUtil.validateRole(token, "admin");
+        assertTrue(isRoleValid, "Token should be valid for the role 'admin'");
     }
 }
