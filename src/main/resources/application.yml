@@ -1,19 +1,17 @@
 quarkus:
   datasource:
     db-kind: "postgresql"
-
   hibernate-orm:
     database:
       generation: none
-
-  smallrye-jwt:
-    issuer: "user-service"
-    signer:
-      privatekey:
-        location: "classpath:private_key.txt"
-      algorithm: RS256
-    publickey:
-      location: "classpath:public_key.txt"
+smallrye:
+  jwt:
+    sign:
+      key:
+        location: "src/main/resources/private.pem"
+    verify:
+      key:
+        location: "src/main/resources/public.pem"
 
 "%test":
   quarkus:
@@ -24,13 +22,14 @@ quarkus:
     hibernate-orm:
       database:
         generation: drop-and-create
-    smallrye-jwt:
-      issuer: "user-service"
-      signer:
-        privatekey:
-          location: "classpath:private_key.txt"
-      publickey:
-        location: "classpath:public_key.txt"
+  smallrye:
+    jwt:
+      sign:
+        key:
+          location: "src/main/resources/private.pem"
+      verify:
+        key:
+          location: "src/main/resources/public.pem"
 
 "%dev":
   quarkus:
@@ -41,10 +40,12 @@ quarkus:
     hibernate-orm:
       database:
         generation: drop-and-create
-    smallrye-jwt:
-      issuer: "user-service"
-      signer:
-        privatekey:
-          location: "classpath:private_key.txt"
-      publickey:
-        location: "classpath:public_key.txt"
+  smallrye:
+    jwt:
+      sign:
+        key:
+          location: "src/main/resources/private.pem"
+      verify:
+        key:
+          location: "src/main/resources/public.pem"
+

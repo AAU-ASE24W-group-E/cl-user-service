@@ -135,7 +135,7 @@ class UserResourceTest {
     @Test
     void addAddressToUser() {
         User user = new User("email5@mail.com", "john5", null, "SomePassword", "USER");
-        Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+Address address = new Address("some street", "Klagenfurt", "9020", "AT");
 
         String userId = given()
                 .contentType(ContentType.JSON)
@@ -174,43 +174,43 @@ class UserResourceTest {
 
 
     @Test
-    public void testUserCreationLoginAndTokenValidation() {
-        User user = new User();
-        user.username = "testuser";
-        user.email = "test@example.com";
-        user.password = "password123";
-        user.role = "admin";
+    public void loginAndValidateUserRoleToken() {
+        User user = new User("email6@mail.com", "john6", null, "password123", "USER");
 
-        Response createUserResponse = given()
-                .contentType("application/json")
+        String userId = given()
+                .contentType(ContentType.JSON)
                 .body(user)
-                .when()
                 .post("/user")
                 .then()
                 .statusCode(200)
+                .log().body(true)
+                .body("email", equalTo("email6@mail.com"))
+                .body("username", equalTo("john6"))
+                .body("role", equalTo("USER"))
                 .extract()
-                .response();
+                .path("id");
 
-        assertNotNull(createUserResponse);
+        assertNotNull(userId, "User ID should not be null after creation");
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.username = "testuser";
+        loginRequest.username = "john6";
         loginRequest.password = "password123";
 
         String token = given()
-                .contentType("application/json")
+                .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .when()
                 .post("/login")
                 .then()
                 .statusCode(200)
+                .log().body(true)
                 .body("token", notNullValue())
                 .extract()
                 .path("token");
 
-        assertNotNull(token);
+        assertNotNull(token, "JWT token should not be null after login");
 
-        boolean isRoleValid = jwtUtil.validateRole(token, "admin");
-        assertTrue(isRoleValid, "Token should be valid for the role 'admin'");
+        boolean isRoleValid = jwtUtil.validateRole(token, "USER");
+        assertTrue(isRoleValid, "Token should be valid for the role 'USER'");
     }
+
 }
