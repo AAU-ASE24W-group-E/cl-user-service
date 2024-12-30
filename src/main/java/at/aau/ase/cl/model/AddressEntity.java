@@ -1,31 +1,23 @@
 package at.aau.ase.cl.model;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
-import java.util.UUID;
-
-@Entity
-@Table(name = "address")
-public class AddressEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public UUID id;
-
+@Embeddable
+public class AddressEntity extends PanacheEntityBase {
     @NotNull
-    @Column(name = "street", nullable = false)
     public String street;
 
     @NotNull
-    @Column(name = "city", nullable = false)
     public String city;
 
     @NotNull
-    @Column(name = "postal_code", nullable = false)
     public String postalCode;
 
     @NotNull
-    @Column(name = "country", nullable = false)
-    public String country;
+    @Pattern(regexp = "^[A-Z]{2}$", message = "Invalid Country Code")
+    public String countryCode;
+
 }

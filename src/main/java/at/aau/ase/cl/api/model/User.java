@@ -10,25 +10,28 @@ public class User {
 
     @Size(min = 1, max = 255)
     @NotNull
-    public String firstName;
+    public String email;
 
     @Size(min = 1, max = 255)
     @NotNull
-    public String lastName;
+    public String username;
 
     public Address address;
+
+    @Size(min = 8, max = 255)
+    @NotNull
+    public String password;
+
+    public String role;
 
     public User() {
     }
 
-    public User( String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public User( String firstName, String lastName, Address address) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public User(String email, String username, Address address, String password, String role) {
+        this.email = email;
+        this.username = username;
         this.address = address;
+        this.password = password;
+        this.role = role;
     }
 }

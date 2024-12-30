@@ -1,11 +1,18 @@
-
 quarkus:
   datasource:
     db-kind: "postgresql"
-
   hibernate-orm:
     database:
       generation: none
+smallrye:
+  jwt:
+    sign:
+      key:
+        location: "src/main/resources/private.pem"
+    verify:
+      issuer: "user-service"
+      key:
+        location: "src/main/resources/public.pem"
 
 "%test":
   quarkus:
@@ -16,17 +23,31 @@ quarkus:
     hibernate-orm:
       database:
         generation: drop-and-create
+  smallrye:
+    jwt:
+      sign:
+        key:
+          location: "src/main/resources/private.pem"
+      verify:
+        issuer: "user-service"
+        key:
+          location: "src/main/resources/public.pem"
 
 "%dev":
   quarkus:
     datasource:
       devservices:
         enabled: true
-        reuse: true
-        username: "crowd-library"
-        password: "crowd-library"
-        jdbc:
-          url: "jdbc:postgresql://localhost:5432/crowd-library"
-      hibernate-orm:
-        database:
-          generation: drop-and-create
+        reuse: false
+    hibernate-orm:
+      database:
+        generation: drop-and-create
+  smallrye:
+    jwt:
+      sign:
+        key:
+          location: "src/main/resources/private.pem"
+      verify:
+        issuer: "user-service"
+        key:
+          location: "src/main/resources/public.pem"

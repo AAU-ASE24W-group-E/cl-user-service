@@ -1,30 +1,46 @@
 package at.aau.ase.cl.model;
 
+import io.quarkus.security.jpa.Password;
+import io.quarkus.security.jpa.Roles;
+import io.quarkus.security.jpa.UserDefinition;
+import io.quarkus.security.jpa.Username;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users") //user table may be already in use
+@UserDefinition
+@Table(name = "users")
 public class UserEntity extends PanacheEntityBase {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
 
-    @Column(name = "first_name", nullable = false)
-    public String firstName;
+    @Username
+    @Column(name = "username", nullable = false, unique = true)
+    public String username;
 
-    @Column(name = "last_name", nullable = false)
-    public String lastName;
+    @Column(name = "email", nullable = false, unique = true)
+    public String email;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    @Password
+    @Column(nullable = false)
+    public String password;
+
+    @Embedded
     public AddressEntity address;
 
-    public List<UserEntity> findByUserId(UUID userId) {
+    @Roles
+    @Column(name = "role", nullable = false)
+    public String role;
 
-        return find("userId", Sort.by("title"), userId).list();
+
+    /**
+     * @param identifier either email or username as both are unique
+     */
+    public static UserEntity findByIdentifier(String identifier) {
+        return find("email = ?1 or username = ?1", identifier).firstResult();
     }
 }

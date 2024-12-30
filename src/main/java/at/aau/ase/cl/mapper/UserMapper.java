@@ -3,6 +3,7 @@ package at.aau.ase.cl.mapper;
 import at.aau.ase.cl.api.model.User;
 import at.aau.ase.cl.model.UserEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
