@@ -4,6 +4,28 @@ quarkus:
   hibernate-orm:
     database:
       generation: none
+  # see https://quarkus.io/guides/flyway
+  flyway:
+    enabled: true
+    table: "user_schema_history"
+    clean-disabled: true
+    baseline-version: "0.0.1"
+    baseline-at-start: true
+    migrate-at-start: true
+
+  # see https://quarkus.io/guides/openapi-swaggerui
+  smallrye-openapi:
+    store-schema-directory: "target/openapi"
+    store-schema-file-name: "user-service.yaml"
+  swagger-ui:
+    always-include: true
+    path: "/docs"
+    query-config-enabled: true
+
+  # see https://quarkus.io/guides/container-image#customizing
+  container-image:
+    group: "AAU-ASE24W-group-E"
+
 smallrye:
   jwt:
     sign:
@@ -23,6 +45,9 @@ smallrye:
     hibernate-orm:
       database:
         generation: drop-and-create
+    flyway:
+      # in %test we drop-and-create the database, thus, migration is neither needed nor possible
+      migrate-at-start: false
   smallrye:
     jwt:
       sign:
