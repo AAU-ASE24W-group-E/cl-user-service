@@ -50,19 +50,15 @@ class UserServiceTest {
         assertNull(createdUser.address);
 
         AddressEntity address = new AddressEntity();
-        address.street = "Street";
-        address.city = "City";
-        address.postalCode = "9020";
-        address.countryCode = "AT";
+        address.latitude = 49.21303;
+        address.longitude = 20.49321;
 
         UserEntity userWithAddress = userService.addAddressToUser(createdUser.id, address);
 
         assertNotNull(userWithAddress);
         assertNotNull(userWithAddress.address);
-        assertEquals("Street", userWithAddress.address.street);
-        assertEquals("City", userWithAddress.address.city);
-        assertEquals("9020", userWithAddress.address.postalCode);
-        assertEquals("AT", userWithAddress.address.countryCode);
+        assertEquals(address.latitude, userWithAddress.address.latitude);
+        assertEquals(address.longitude, userWithAddress.address.longitude);
     }
 
     @Test

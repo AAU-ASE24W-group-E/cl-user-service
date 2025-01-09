@@ -2,22 +2,20 @@ package at.aau.ase.cl.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Embeddable
 public class AddressEntity extends PanacheEntityBase {
     @NotNull
-    public String street;
+    @Min(value = -90, message = "Latitude must be between -90 and 90")
+    @Max(value = 90, message = "Latitude must be between -90 and 90")
+    public Double latitude;
 
     @NotNull
-    public String city;
-
-    @NotNull
-    public String postalCode;
-
-    @NotNull
-    @Pattern(regexp = "^[A-Z]{2}$", message = "Invalid Country Code")
-    public String countryCode;
-
+    @Min(value = -180, message = "Longitude must be between -180 and 180")
+    @Max(value = 180, message = "Longitude must be between -180 and 180")
+    public Double longitude;
 }

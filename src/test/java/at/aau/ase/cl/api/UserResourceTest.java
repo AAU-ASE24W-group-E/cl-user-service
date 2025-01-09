@@ -43,7 +43,7 @@ class UserResourceTest {
 
     @Test
     void createUserWithAddress() {
-        Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+        Address address = new Address(49.21303, 20.49321);
         User user = new User("email2@mail.com", "john2", address, "SomePassword", "USER");
 
         String hashedPassword = given()
@@ -55,10 +55,8 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email2@mail.com"))
                 .body("username", equalTo("john2"))
-                .body("address.street", equalTo("some street"))
-                .body("address.city", equalTo("Klagenfurt"))
-                .body("address.postalCode", equalTo("9020"))
-                .body("address.countryCode", equalTo("AT"))
+                .body("address.latitude", equalTo(49.21303))
+                .body("address.longitude", equalTo(20.49321))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
@@ -68,7 +66,7 @@ class UserResourceTest {
 
     @Test
     void getUserWithAddress() {
-        Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+        Address address = new Address(49.21303, 20.49321);
         User user = new User("email3@mail.com", "john3", address, "SomePassword", "USER");
 
         String userId = given()
@@ -90,10 +88,8 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email3@mail.com"))
                 .body("username", equalTo("john3"))
-                .body("address.street", equalTo("some street"))
-                .body("address.city", equalTo("Klagenfurt"))
-                .body("address.postalCode", equalTo("9020"))
-                .body("address.countryCode", equalTo("AT"))
+                .body("address.latitude", equalTo(49.21303))
+                .body("address.longitude", equalTo(20.49321))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
@@ -135,7 +131,7 @@ class UserResourceTest {
     @Test
     void addAddressToUser() {
         User user = new User("email5@mail.com", "john5", null, "SomePassword", "USER");
-Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+        Address address = new Address(49.21303, 20.49321);
 
         String userId = given()
                 .contentType(ContentType.JSON)
@@ -153,10 +149,8 @@ Address address = new Address("some street", "Klagenfurt", "9020", "AT");
                 .then()
                 .statusCode(200)
                 .log().body(true)
-                .body("address.street", equalTo("some street"))
-                .body("address.city", equalTo("Klagenfurt"))
-                .body("address.postalCode", equalTo("9020"))
-                .body("address.countryCode", equalTo("AT"))
+                .body("address.latitude", equalTo(49.21303))
+                .body("address.longitude", equalTo(20.49321))
                 .body("role", equalTo("USER"));
 
         String hashedPassword = given()
