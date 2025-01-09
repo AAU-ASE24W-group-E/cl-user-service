@@ -52,6 +52,15 @@ public class UserResource {
         return Response.ok(result).build();
     }
 
+    @PUT
+    @Path("user/{id}/address")
+    public Response updateAddress(@PathParam("id") UUID id, @Valid Address address) {
+        var modelAddress = AddressMapper.INSTANCE.map(address);
+        var modelUser = service.updateAddress(id, modelAddress);
+        var result = UserMapper.INSTANCE.map(modelUser);
+        return Response.ok(result).build();
+    }
+
     @POST
     @Path("login")
     public Response login(@Valid LoginRequest loginRequest) {

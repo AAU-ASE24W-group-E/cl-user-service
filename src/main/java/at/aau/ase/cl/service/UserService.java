@@ -9,7 +9,6 @@ import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
-import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -40,11 +39,28 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity addAddressToUser(UUID userId, AddressEntity address) {
+    public UserEntity addAddressToUser(UUID userId,
+                                       AddressEntity address) {
         UserEntity user = getUserById(userId);
         user.address = address;
         user.persistAndFlush();
         Log.debugf("Added address to User with id %s: %s", userId, user);
+        return user;
+    }
+
+    @Transactional
+    public UserEntity updateAddress(UUID userId,
+                                    AddressEntity address) {
+        UserEntity user = getUserById(userId);
+        if (user.address == null) {
+            throw new NotFoundException("User with id " + userId + " does not have an address to update");
+        }
+
+        user.address.latitude = address.latitude;
+        user.address.longitude = address.longitude;
+        user.persistAndFlush();
+
+        Log.debugf("Updated address to User with id %s: %s", userId, user);
         return user;
     }
 
