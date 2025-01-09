@@ -62,7 +62,7 @@ public class UserResource {
     }
 
     @POST
-    @Path("login")
+    @Path("/user/login")
     public Response login(@Valid LoginRequest loginRequest) {
         var user = service.findByUsernameOrEmail(loginRequest.username);
         if (user == null || !BCrypt.checkpw(loginRequest.password, user.password)) {
