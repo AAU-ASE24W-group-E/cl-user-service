@@ -65,8 +65,8 @@ class UserServiceTest {
     public void testUpdateAddressOfUser() {
         UserEntity user = new UserEntity();
         user.address = null;
-        user.email = "email2";
-        user.username = "username2";
+        user.email = "email3";
+        user.username = "username3";
         user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
@@ -99,8 +99,8 @@ class UserServiceTest {
     public void testAddUserWhichAlreadyExists() {
         UserEntity user = new UserEntity();
         user.address = null;
-        user.email = "email3";
-        user.username = "username3";
+        user.email = "email4";
+        user.username = "username4";
         user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
