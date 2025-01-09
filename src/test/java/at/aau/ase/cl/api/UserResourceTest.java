@@ -64,6 +64,7 @@ class UserResourceTest {
         assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
+
     @Test
     void getUserWithAddress() {
         Address address = new Address(49.21303, 20.49321);
@@ -165,7 +166,54 @@ class UserResourceTest {
         assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
+    @Test
+    void updateAddressOfUser() {
+        Address oldAddress = new Address(49.21303, 20.49321);
+        Address newAddress = new Address(50.21303, 20.49321);
+        User user = new User("email5@mail.com", "john5", oldAddress, "SomePassword", "USER");
 
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        given().pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .body(oldAddress)
+                .post("/user/{id}/address")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
+                .body("role", equalTo("USER"));
+
+        given().pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .body(newAddress)
+                .put("/user/{id}/address")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("address.latitude", equalTo(50.21303F))
+                .body("address.longitude", equalTo(20.49321F))
+                .body("role", equalTo("USER"));
+
+        String hashedPassword = given()
+                .pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .get("/user/{id}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("password");
+
+        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
+    }
 
     @Test
     public void loginAndValidateUserRoleToken() {
@@ -193,7 +241,7 @@ class UserResourceTest {
         String token = given()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .post("/login")
+                .post("/user/login")
                 .then()
                 .statusCode(200)
                 .log().body(true)

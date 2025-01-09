@@ -62,6 +62,40 @@ class UserServiceTest {
     }
 
     @Test
+    public void testUpdateAddressOfUser() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.email = "email2";
+        user.username = "username2";
+        user.password = "SomePassword";
+
+        UserEntity createdUser = userService.createUser(user);
+        assertNotNull(createdUser);
+        assertNull(createdUser.address);
+
+        AddressEntity address = new AddressEntity();
+        address.latitude = 49.21303;
+        address.longitude = 20.49321;
+
+        UserEntity userWithAddress = userService.addAddressToUser(createdUser.id, address);
+
+        assertNotNull(userWithAddress);
+        assertNotNull(userWithAddress.address);
+        assertEquals(address.latitude, userWithAddress.address.latitude);
+        assertEquals(address.longitude, userWithAddress.address.longitude);
+
+        AddressEntity newAddress = new AddressEntity();
+        newAddress.latitude = 50.21303;
+        newAddress.longitude = 20.49321;
+
+        UserEntity userWithNewAddress = userService.updateAddress(createdUser.id, newAddress);
+        assertNotNull(userWithNewAddress);
+        assertNotNull(userWithNewAddress.address);
+        assertEquals(newAddress.latitude, userWithNewAddress.address.latitude);
+        assertEquals(newAddress.longitude, userWithNewAddress.address.longitude);
+    }
+
+    @Test
     public void testAddUserWhichAlreadyExists() {
         UserEntity user = new UserEntity();
         user.address = null;
