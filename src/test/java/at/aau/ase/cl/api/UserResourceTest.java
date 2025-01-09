@@ -55,8 +55,8 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email2@mail.com"))
                 .body("username", equalTo("john2"))
-                .body("address.latitude", equalTo(49.21303))
-                .body("address.longitude", equalTo(20.49321))
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
@@ -88,8 +88,8 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email3@mail.com"))
                 .body("username", equalTo("john3"))
-                .body("address.latitude", equalTo(49.21303))
-                .body("address.longitude", equalTo(20.49321))
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
@@ -149,8 +149,8 @@ class UserResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body(true)
-                .body("address.latitude", equalTo(49.21303))
-                .body("address.longitude", equalTo(20.49321))
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"));
 
         String hashedPassword = given()
