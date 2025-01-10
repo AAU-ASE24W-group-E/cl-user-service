@@ -29,6 +29,9 @@ public class UserEntity extends PanacheEntityBase {
     @Column(nullable = false)
     public String password;
 
+    @Column(name = "initial_login_pending")
+    public boolean initialLoginPending;
+
     @Embedded
     public AddressEntity address;
 

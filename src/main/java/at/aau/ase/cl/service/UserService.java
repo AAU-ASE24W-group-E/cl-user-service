@@ -9,7 +9,6 @@ import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
-import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -18,6 +17,7 @@ public class UserService {
     @Transactional
     public UserEntity createUser(UserEntity user) {
         try {
+            user.initialLoginPending = true;
             user.password = BcryptUtil.bcryptHash(user.password);
             if (user.role == null || user.role.isEmpty()) {
                 user.role = "USER";
@@ -26,6 +26,15 @@ public class UserService {
         } catch (PersistenceException e) {
             throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
         }
+        return user;
+    }
+
+    @Transactional
+    public UserEntity updateInitialLoginState(UUID id) {
+        UserEntity user = getUserById(id);
+
+        user.initialLoginPending = false;
+        user.persistAndFlush();
         return user;
     }
 
@@ -40,11 +49,25 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity addAddressToUser(UUID userId, AddressEntity address) {
+    public UserEntity addAddressToUser(UUID userId,
+                                       AddressEntity address) {
         UserEntity user = getUserById(userId);
         user.address = address;
         user.persistAndFlush();
         Log.debugf("Added address to User with id %s: %s", userId, user);
+        return user;
+    }
+
+    @Transactional
+    public UserEntity updateAddress(UUID userId,
+                                    AddressEntity address) {
+        UserEntity user = getUserById(userId);
+
+        user.address.latitude = address.latitude;
+        user.address.longitude = address.longitude;
+        user.persistAndFlush();
+
+        Log.debugf("Updated address to User with id %s: %s", userId, user);
         return user;
     }
 

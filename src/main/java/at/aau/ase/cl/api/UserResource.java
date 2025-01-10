@@ -1,9 +1,6 @@
 package at.aau.ase.cl.api;
 
-import at.aau.ase.cl.api.model.Address;
-import at.aau.ase.cl.api.model.LoginRequest;
-import at.aau.ase.cl.api.model.LoginResponse;
-import at.aau.ase.cl.api.model.User;
+import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.mapper.UserMapper;
 import at.aau.ase.cl.service.UserService;
@@ -45,15 +42,36 @@ public class UserResource {
 
     @POST
     @Path("user/{id}/address")
-    public Response addAddressToUser(@PathParam("id") UUID id, @Valid Address address) {
+    public Response addAddressToUser(@PathParam("id") UUID id,
+                                     @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
         var modelUser = service.addAddressToUser(id, modelAddress);
         var result = UserMapper.INSTANCE.map(modelUser);
         return Response.ok(result).build();
     }
 
+    @PUT
+    @Path("user/{id}/address")
+    public Response updateAddress(@PathParam("id") UUID id,
+                                  @Valid Address address) {
+        var modelAddress = AddressMapper.INSTANCE.map(address);
+        var modelUser = service.updateAddress(id, modelAddress);
+        var result = UserMapper.INSTANCE.map(modelUser);
+        return Response.ok(result).build();
+    }
+
+    @PUT
+    @Path("user/{id}/set-initial-login")
+    public Response updateInitialLoginState(@PathParam("id") UUID id) {
+        var updatedUser = service.updateInitialLoginState(id);
+        var resultDto = UserMapper.INSTANCE.map(updatedUser);
+
+        return Response.ok(resultDto).build();
+    }
+
+
     @POST
-    @Path("login")
+    @Path("/user/login")
     public Response login(@Valid LoginRequest loginRequest) {
         var user = service.findByUsernameOrEmail(loginRequest.username);
         if (user == null || !BCrypt.checkpw(loginRequest.password, user.password)) {
@@ -61,6 +79,7 @@ public class UserResource {
         }
 
         String token = JWT_Util.generateToken(user.id.toString(), user.username, user.role);
-        return Response.ok(new LoginResponse(token)).build();
+        User userDto = UserMapper.INSTANCE.map(user);
+        return Response.ok(new LoginResponse(token, userDto)).build();
     }
 }

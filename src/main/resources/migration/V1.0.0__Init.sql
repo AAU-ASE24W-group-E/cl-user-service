@@ -11,6 +11,7 @@ CREATE TABLE Users (
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    initial_login_pending BOOLEAN DEFAULT TRUE,
     address_id INT REFERENCES Address(id),
     role VARCHAR(255) NOT NULL
 );

@@ -5,7 +5,6 @@ import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Test;
 
@@ -50,23 +49,19 @@ class UserServiceTest {
         assertNull(createdUser.address);
 
         AddressEntity address = new AddressEntity();
-        address.street = "Street";
-        address.city = "City";
-        address.postalCode = "9020";
-        address.countryCode = "AT";
+        address.latitude = 49.21303;
+        address.longitude = 20.49321;
 
         UserEntity userWithAddress = userService.addAddressToUser(createdUser.id, address);
 
         assertNotNull(userWithAddress);
         assertNotNull(userWithAddress.address);
-        assertEquals("Street", userWithAddress.address.street);
-        assertEquals("City", userWithAddress.address.city);
-        assertEquals("9020", userWithAddress.address.postalCode);
-        assertEquals("AT", userWithAddress.address.countryCode);
+        assertEquals(address.latitude, userWithAddress.address.latitude);
+        assertEquals(address.longitude, userWithAddress.address.longitude);
     }
 
     @Test
-    public void testAddUserWhichAlreadyExists() {
+    public void testUpdateAddressOfUser() {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email3";
@@ -74,9 +69,60 @@ class UserServiceTest {
         user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
+        assertNotNull(createdUser);
+        assertNull(createdUser.address);
+
+        AddressEntity address = new AddressEntity();
+        address.latitude = 49.21303;
+        address.longitude = 20.49321;
+
+        UserEntity userWithAddress = userService.addAddressToUser(createdUser.id, address);
+
+        assertNotNull(userWithAddress);
+        assertNotNull(userWithAddress.address);
+        assertEquals(address.latitude, userWithAddress.address.latitude);
+        assertEquals(address.longitude, userWithAddress.address.longitude);
+
+        AddressEntity newAddress = new AddressEntity();
+        newAddress.latitude = 50.21303;
+        newAddress.longitude = 20.49321;
+
+        UserEntity userWithNewAddress = userService.updateAddress(createdUser.id, newAddress);
+        assertNotNull(userWithNewAddress);
+        assertNotNull(userWithNewAddress.address);
+        assertEquals(newAddress.latitude, userWithNewAddress.address.latitude);
+        assertEquals(newAddress.longitude, userWithNewAddress.address.longitude);
+    }
+
+    @Test
+    public void testAddUserWhichAlreadyExists() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.email = "email4";
+        user.username = "username4";
+        user.password = "SomePassword";
+
+        UserEntity createdUser = userService.createUser(user);
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(createdUser));
     }
 
+    @Test
+    public void testSetLoginState() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.email = "email5";
+        user.username = "username5";
+        user.password = "SomePassword";
+
+        UserEntity createdUser = userService.createUser(user);
+        assertNotNull(createdUser);
+        assertNull(createdUser.address);
+        assertTrue(createdUser.initialLoginPending);
+
+        UserEntity updatedLoginStateUser = userService.updateInitialLoginState(createdUser.id);
+        assertNotNull(updatedLoginStateUser);
+        assertFalse(updatedLoginStateUser.initialLoginPending);
+    }
 
     @Test
     public void testGetUserThatDoesNotExist() {

@@ -40,7 +40,7 @@ class UserOnlyResourceTest {
         String token = given()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .post("/login")
+                .post("/user/login")
                 .then()
                 .statusCode(200)
                 .extract()

@@ -1,38 +1,28 @@
 package at.aau.ase.cl.api.model;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.util.Arrays;
 import java.util.Locale;
 
 public class Address {
-    @Size(min = 1, max = 255)
     @NotNull
-    public String street;
-
-    @Size(min = 1, max = 255)
-    @NotNull
-    public String city;
-
-    @Size(min = 1, max = 50)
-    @NotNull
-    public String postalCode;
+    @Min(value = -90, message = "Latitude must be between -90 and 90")
+    @Max(value = 90, message = "Latitude must be between -90 and 90")
+    public Double latitude;
 
     @NotNull
-    @Pattern(regexp = "^[A-Z]{2}$", message = "Invalid Country Code")
-    public String countryCode;
+    @Min(value = -180, message = "Longitude must be between -180 and 180")
+    @Max(value = 180, message = "Longitude must be between -180 and 180")
+    public Double longitude;
 
     public Address() {
     }
 
-    public Address(String street, String city, String postalCode, String countryCode) {
-        this.street = street;
-        this.city = city;
-        this.postalCode = postalCode;
-        this.countryCode = countryCode;
-        validateCountryCode(this.countryCode);
+    public Address(Double latitude,
+                   Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public void validateCountryCode(String countryCode) {

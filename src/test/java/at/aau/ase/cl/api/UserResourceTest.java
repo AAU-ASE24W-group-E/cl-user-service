@@ -32,6 +32,7 @@ class UserResourceTest {
                 .statusCode(200)
                 .log().body(true)
                 .body("email", equalTo("email1@mail.com"))
+                .body("initialLoginPending", equalTo(true))
                 .body("username", equalTo("john1"))
                 .body("address", equalTo(null))
                 .body("role", equalTo("USER"))
@@ -43,7 +44,7 @@ class UserResourceTest {
 
     @Test
     void createUserWithAddress() {
-        Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+        Address address = new Address(49.21303, 20.49321);
         User user = new User("email2@mail.com", "john2", address, "SomePassword", "USER");
 
         String hashedPassword = given()
@@ -55,10 +56,9 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email2@mail.com"))
                 .body("username", equalTo("john2"))
-                .body("address.street", equalTo("some street"))
-                .body("address.city", equalTo("Klagenfurt"))
-                .body("address.postalCode", equalTo("9020"))
-                .body("address.countryCode", equalTo("AT"))
+                .body("initialLoginPending", equalTo(true))
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
@@ -66,9 +66,10 @@ class UserResourceTest {
         assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
+
     @Test
     void getUserWithAddress() {
-        Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+        Address address = new Address(49.21303, 20.49321);
         User user = new User("email3@mail.com", "john3", address, "SomePassword", "USER");
 
         String userId = given()
@@ -90,10 +91,9 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email3@mail.com"))
                 .body("username", equalTo("john3"))
-                .body("address.street", equalTo("some street"))
-                .body("address.city", equalTo("Klagenfurt"))
-                .body("address.postalCode", equalTo("9020"))
-                .body("address.countryCode", equalTo("AT"))
+                .body("initialLoginPending", equalTo(true))
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
@@ -122,6 +122,7 @@ class UserResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body(true)
+                .body("initialLoginPending", equalTo(true))
                 .body("email", equalTo("email4@mail.com"))
                 .body("username", equalTo("john4"))
                 .body("address", equalTo(null))
@@ -135,7 +136,7 @@ class UserResourceTest {
     @Test
     void addAddressToUser() {
         User user = new User("email5@mail.com", "john5", null, "SomePassword", "USER");
-Address address = new Address("some street", "Klagenfurt", "9020", "AT");
+        Address address = new Address(49.21303, 20.49321);
 
         String userId = given()
                 .contentType(ContentType.JSON)
@@ -153,10 +154,8 @@ Address address = new Address("some street", "Klagenfurt", "9020", "AT");
                 .then()
                 .statusCode(200)
                 .log().body(true)
-                .body("address.street", equalTo("some street"))
-                .body("address.city", equalTo("Klagenfurt"))
-                .body("address.postalCode", equalTo("9020"))
-                .body("address.countryCode", equalTo("AT"))
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"));
 
         String hashedPassword = given()
@@ -171,11 +170,58 @@ Address address = new Address("some street", "Klagenfurt", "9020", "AT");
         assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
+    @Test
+    void updateAddressOfUser() {
+        Address oldAddress = new Address(49.21303, 20.49321);
+        Address newAddress = new Address(50.21303, 20.49321);
+        User user = new User("email6@mail.com", "john6", oldAddress, "SomePassword", "USER");
 
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        given().pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .body(oldAddress)
+                .post("/user/{id}/address")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("address.latitude", equalTo(49.21303F))
+                .body("address.longitude", equalTo(20.49321F))
+                .body("role", equalTo("USER"));
+
+        given().pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .body(newAddress)
+                .put("/user/{id}/address")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("address.latitude", equalTo(50.21303F))
+                .body("address.longitude", equalTo(20.49321F))
+                .body("role", equalTo("USER"));
+
+        String hashedPassword = given()
+                .pathParam("id", userId)
+                .contentType(ContentType.JSON)
+                .get("/user/{id}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("password");
+
+        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
+    }
 
     @Test
     public void loginAndValidateUserRoleToken() {
-        User user = new User("email6@mail.com", "john6", null, "password123", "USER");
+        User user = new User("email7@mail.com", "john7", null, "password123", "USER");
 
         String userId = given()
                 .contentType(ContentType.JSON)
@@ -184,8 +230,8 @@ Address address = new Address("some street", "Klagenfurt", "9020", "AT");
                 .then()
                 .statusCode(200)
                 .log().body(true)
-                .body("email", equalTo("email6@mail.com"))
-                .body("username", equalTo("john6"))
+                .body("email", equalTo("email7@mail.com"))
+                .body("username", equalTo("john7"))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("id");
@@ -193,13 +239,13 @@ Address address = new Address("some street", "Klagenfurt", "9020", "AT");
         assertNotNull(userId, "User ID should not be null after creation");
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.username = "john6";
+        loginRequest.username = "john7";
         loginRequest.password = "password123";
 
         String token = given()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .post("/login")
+                .post("/user/login")
                 .then()
                 .statusCode(200)
                 .log().body(true)
@@ -213,4 +259,46 @@ Address address = new Address("some street", "Klagenfurt", "9020", "AT");
         assertTrue(isRoleValid, "Token should be valid for the role 'USER'");
     }
 
+    @Test
+    public void loginAndUpdateLoginState() {
+        User user = new User("email8@mail.com", "john8", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("initialLoginPending", equalTo(true))
+                .body("email", equalTo("email8@mail.com"))
+                .body("username", equalTo("john8"))
+                .body("role", equalTo("USER"))
+                .extract()
+                .path("id");
+
+        given()
+                .contentType(ContentType.JSON)
+                .put("/user/" + userId + "/set-initial-login")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .extract()
+                .path("id");
+
+        String hashedPassword = given()
+                .contentType(ContentType.JSON)
+                .get("/user/" + userId)
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("initialLoginPending", equalTo(false))
+                .body("email", equalTo("email8@mail.com"))
+                .body("username", equalTo("john8"))
+                .body("role", equalTo("USER"))
+                .extract()
+                .path("password");
+
+        assertTrue(BcryptUtil.matches("password123", hashedPassword), "Password does not match the hash");
+    }
 }
