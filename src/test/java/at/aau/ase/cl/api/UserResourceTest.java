@@ -293,8 +293,8 @@ class UserResourceTest {
                 .statusCode(200)
                 .log().body(true)
                 .body("initialLoginPending", equalTo(false))
-                .body("email", equalTo("email7@mail.com"))
-                .body("username", equalTo("john7"))
+                .body("email", equalTo("email8@mail.com"))
+                .body("username", equalTo("john8"))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
