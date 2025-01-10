@@ -170,7 +170,7 @@ class UserResourceTest {
     void updateAddressOfUser() {
         Address oldAddress = new Address(49.21303, 20.49321);
         Address newAddress = new Address(50.21303, 20.49321);
-        User user = new User("email5@mail.com", "john5", oldAddress, "SomePassword", "USER");
+        User user = new User("email6@mail.com", "john6", oldAddress, "SomePassword", "USER");
 
         String userId = given()
                 .contentType(ContentType.JSON)
@@ -217,7 +217,7 @@ class UserResourceTest {
 
     @Test
     public void loginAndValidateUserRoleToken() {
-        User user = new User("email6@mail.com", "john6", null, "password123", "USER");
+        User user = new User("email7@mail.com", "john7", null, "password123", "USER");
 
         String userId = given()
                 .contentType(ContentType.JSON)
@@ -226,8 +226,8 @@ class UserResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body(true)
-                .body("email", equalTo("email6@mail.com"))
-                .body("username", equalTo("john6"))
+                .body("email", equalTo("email7@mail.com"))
+                .body("username", equalTo("john7"))
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("id");
