@@ -28,6 +28,12 @@ public class UserService {
         return user;
     }
 
+    @Transactional
+    public UserEntity updateUser(UserEntity user) {
+        user.persistAndFlush();
+        return user;
+    }
+
     public UserEntity getUserById(UUID id) {
         UserEntity user = UserEntity.findById(id);
         if (user == null) {

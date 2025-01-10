@@ -24,6 +24,8 @@ public class User {
 
     public String role;
 
+    public boolean initialLoginPending;
+
     public User() {
     }
 

@@ -1,9 +1,6 @@
 package at.aau.ase.cl.api;
 
-import at.aau.ase.cl.api.model.Address;
-import at.aau.ase.cl.api.model.LoginRequest;
-import at.aau.ase.cl.api.model.LoginResponse;
-import at.aau.ase.cl.api.model.User;
+import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.mapper.UserMapper;
 import at.aau.ase.cl.service.UserService;
@@ -45,7 +42,8 @@ public class UserResource {
 
     @POST
     @Path("user/{id}/address")
-    public Response addAddressToUser(@PathParam("id") UUID id, @Valid Address address) {
+    public Response addAddressToUser(@PathParam("id") UUID id,
+                                     @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
         var modelUser = service.addAddressToUser(id, modelAddress);
         var result = UserMapper.INSTANCE.map(modelUser);
@@ -54,12 +52,32 @@ public class UserResource {
 
     @PUT
     @Path("user/{id}/address")
-    public Response updateAddress(@PathParam("id") UUID id, @Valid Address address) {
+    public Response updateAddress(@PathParam("id") UUID id,
+                                  @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
         var modelUser = service.updateAddress(id, modelAddress);
         var result = UserMapper.INSTANCE.map(modelUser);
         return Response.ok(result).build();
     }
+
+    @PUT
+    @Path("user/{id}/login-state")
+    public Response updateInitialLoginState(@PathParam("id") UUID id,
+                                            @Valid
+                                            InitialLoginPendingRequest request) {
+        var user = service.getUserById(id);
+
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        }
+
+        user.initialLoginPending = request.initialLoginPending;
+        var modelUser = service.updateUser(user);
+        var result = UserMapper.INSTANCE.map(modelUser);
+
+        return Response.ok(result).build();
+    }
+
 
     @POST
     @Path("/user/login")
