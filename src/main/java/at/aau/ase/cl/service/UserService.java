@@ -29,6 +29,19 @@ public class UserService {
         return user;
     }
 
+    @Transactional
+    public UserEntity updateInitialLoginState(UUID id) {
+        UserEntity user = getUserById(id);
+
+        if (user == null) {
+            throw new NotFoundException("User with id " + id + " was not found");
+        }
+
+        user.initialLoginPending = false;
+        user.persistAndFlush();
+        return user;
+    }
+
     public UserEntity getUserById(UUID id) {
         UserEntity user = UserEntity.findById(id);
         if (user == null) {
