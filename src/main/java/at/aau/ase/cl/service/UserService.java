@@ -17,6 +17,7 @@ public class UserService {
     @Transactional
     public UserEntity createUser(UserEntity user) {
         try {
+            user.initialLoginPending = true;
             user.password = BcryptUtil.bcryptHash(user.password);
             if (user.role == null || user.role.isEmpty()) {
                 user.role = "USER";
@@ -25,12 +26,6 @@ public class UserService {
         } catch (PersistenceException e) {
             throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
         }
-        return user;
-    }
-
-    @Transactional
-    public UserEntity updateUser(UserEntity user) {
-        user.persistAndFlush();
         return user;
     }
 

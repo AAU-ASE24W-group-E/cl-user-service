@@ -61,20 +61,16 @@ public class UserResource {
     }
 
     @PUT
-    @Path("user/{id}/login-state")
-    public Response updateInitialLoginState(@PathParam("id") UUID id,
-                                            @Valid
-                                            InitialLoginPendingRequest request) {
+    @Path("user/{id}/set-initial-login")
+    public Response updateInitialLoginState(@PathParam("id") UUID id) {
         var user = service.getUserById(id);
 
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
         }
 
-        user.initialLoginPending = request.initialLoginPending;
-        var modelUser = service.updateUser(user);
-        var result = UserMapper.INSTANCE.map(modelUser);
-
+        user.initialLoginPending = false;
+        var result = UserMapper.INSTANCE.map(user);
         return Response.ok(result).build();
     }
 
