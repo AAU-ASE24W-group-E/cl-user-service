@@ -32,6 +32,7 @@ class UserResourceTest {
                 .statusCode(200)
                 .log().body(true)
                 .body("email", equalTo("email1@mail.com"))
+                .body("initialLoginPending", equalTo(true))
                 .body("username", equalTo("john1"))
                 .body("address", equalTo(null))
                 .body("role", equalTo("USER"))
@@ -55,6 +56,7 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email2@mail.com"))
                 .body("username", equalTo("john2"))
+                .body("initialLoginPending", equalTo(true))
                 .body("address.latitude", equalTo(49.21303F))
                 .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"))
@@ -89,6 +91,7 @@ class UserResourceTest {
                 .log().body(true)
                 .body("email", equalTo("email3@mail.com"))
                 .body("username", equalTo("john3"))
+                .body("initialLoginPending", equalTo(true))
                 .body("address.latitude", equalTo(49.21303F))
                 .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"))
@@ -119,6 +122,7 @@ class UserResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body(true)
+                .body("initialLoginPending", equalTo(true))
                 .body("email", equalTo("email4@mail.com"))
                 .body("username", equalTo("john4"))
                 .body("address", equalTo(null))
@@ -255,4 +259,46 @@ class UserResourceTest {
         assertTrue(isRoleValid, "Token should be valid for the role 'USER'");
     }
 
+    @Test
+    public void loginAndUpdateLoginState() {
+        User user = new User("email8@mail.com", "john8", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("initialLoginPending", equalTo(true))
+                .body("email", equalTo("email8@mail.com"))
+                .body("username", equalTo("john8"))
+                .body("role", equalTo("USER"))
+                .extract()
+                .path("id");
+
+        given()
+                .contentType(ContentType.JSON)
+                .put("/user/" + userId + "/set-initial-login")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .extract()
+                .path("id");
+
+        String hashedPassword = given()
+                .contentType(ContentType.JSON)
+                .get("/user/" + userId)
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("initialLoginPending", equalTo(false))
+                .body("email", equalTo("email7@mail.com"))
+                .body("username", equalTo("john7"))
+                .body("role", equalTo("USER"))
+                .extract()
+                .path("password");
+
+        assertTrue(BcryptUtil.matches("password123", hashedPassword), "Password does not match the hash");
+    }
 }

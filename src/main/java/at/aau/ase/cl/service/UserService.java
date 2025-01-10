@@ -33,10 +33,6 @@ public class UserService {
     public UserEntity updateInitialLoginState(UUID id) {
         UserEntity user = getUserById(id);
 
-        if (user == null) {
-            throw new NotFoundException("User with id " + id + " was not found");
-        }
-
         user.initialLoginPending = false;
         user.persistAndFlush();
         return user;
@@ -66,9 +62,6 @@ public class UserService {
     public UserEntity updateAddress(UUID userId,
                                     AddressEntity address) {
         UserEntity user = getUserById(userId);
-        if (user.address == null) {
-            throw new NotFoundException("User with id " + userId + " does not have an address to update");
-        }
 
         user.address.latitude = address.latitude;
         user.address.longitude = address.longitude;

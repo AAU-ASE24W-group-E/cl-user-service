@@ -5,7 +5,6 @@ import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Test;
 
@@ -107,6 +106,23 @@ class UserServiceTest {
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(createdUser));
     }
 
+    @Test
+    public void testSetLoginState() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.email = "email5";
+        user.username = "username5";
+        user.password = "SomePassword";
+
+        UserEntity createdUser = userService.createUser(user);
+        assertNotNull(createdUser);
+        assertNull(createdUser.address);
+        assertTrue(createdUser.initialLoginPending);
+
+        UserEntity updatedLoginStateUser = userService.updateInitialLoginState(createdUser.id);
+        assertNotNull(updatedLoginStateUser);
+        assertFalse(updatedLoginStateUser.initialLoginPending);
+    }
 
     @Test
     public void testGetUserThatDoesNotExist() {
