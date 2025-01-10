@@ -7,7 +7,6 @@ import at.aau.ase.cl.util.JWT_Util;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
@@ -220,7 +219,7 @@ class UserResourceTest {
     }
 
     @Test
-    public void loginAndValidateUserRoleToken() {
+    void loginAndValidateUserRoleToken() {
         User user = new User("email7@mail.com", "john7", null, "password123", "USER");
 
         String userId = given()
@@ -260,7 +259,7 @@ class UserResourceTest {
     }
 
     @Test
-    public void loginAndUpdateLoginState() {
+    void loginAndUpdateLoginState() {
         User user = new User("email8@mail.com", "john8", null, "password123", "USER");
 
         String userId = given()

@@ -19,7 +19,7 @@ class UserServiceTest {
     UserService userService;
 
     @Test
-    public void testCreateUser() {
+    void testCreateUser() {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email1";
@@ -37,7 +37,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testAddAddressToUser() {
+    void testAddAddressToUser() {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email2";
@@ -61,7 +61,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testUpdateAddressOfUser() {
+    void testUpdateAddressOfUser() {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email3";
@@ -95,7 +95,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testAddUserWhichAlreadyExists() {
+    void testAddUserWhichAlreadyExists() {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email4";
@@ -107,7 +107,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testSetLoginState() {
+    void testSetLoginState() {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email5";
@@ -125,12 +125,17 @@ class UserServiceTest {
     }
 
     @Test
-    public void testGetUserThatDoesNotExist() {
-        assertThrows(NotFoundException.class, () -> userService.getUserById(UUID.randomUUID()));
+    void testGetUserThatDoesNotExist() {
+        UUID randomUserId = UUID.randomUUID();
+
+        assertThrows(NotFoundException.class, () -> userService.getUserById(randomUserId));
     }
 
     @Test
     public void testAddressToUserThatDoesNotExist() {
-        assertThrows(NotFoundException.class, () -> userService.addAddressToUser(UUID.randomUUID(), null));
+        UUID randomUserId = UUID.randomUUID();
+
+        assertThrows(NotFoundException.class, () -> userService.addAddressToUser(randomUserId, null));
     }
+
 }
