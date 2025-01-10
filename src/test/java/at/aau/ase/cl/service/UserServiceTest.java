@@ -132,7 +132,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testAddressToUserThatDoesNotExist() {
+    void testAddressToUserThatDoesNotExist() {
         UUID randomUserId = UUID.randomUUID();
 
         assertThrows(NotFoundException.class, () -> userService.addAddressToUser(randomUserId, null));
