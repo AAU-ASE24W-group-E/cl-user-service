@@ -88,6 +88,7 @@ public class UserResource {
         }
 
         String token = JWT_Util.generateToken(user.id.toString(), user.username, user.role);
-        return Response.ok(new LoginResponse(token)).build();
+        User userDto = UserMapper.INSTANCE.map(user);
+        return Response.ok(new LoginResponse(token, userDto)).build();
     }
 }
