@@ -10,7 +10,6 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(target = "password", ignore = true)
     UserEntity map(User user);
 
     User map(UserEntity userEntity);
