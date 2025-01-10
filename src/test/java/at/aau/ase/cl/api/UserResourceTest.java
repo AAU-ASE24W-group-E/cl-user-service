@@ -235,7 +235,7 @@ class UserResourceTest {
         assertNotNull(userId, "User ID should not be null after creation");
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.username = "john6";
+        loginRequest.username = "john7";
         loginRequest.password = "password123";
 
         String token = given()
