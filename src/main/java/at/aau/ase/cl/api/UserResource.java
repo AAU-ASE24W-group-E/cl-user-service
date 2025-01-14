@@ -24,7 +24,7 @@ public class UserResource {
     UserService service;
 
     @POST
-    @Path("user")
+    @Path("/")
     public Response createUser(User user) {
         var model = UserMapper.INSTANCE.map(user);
         model = service.createUser(model);
