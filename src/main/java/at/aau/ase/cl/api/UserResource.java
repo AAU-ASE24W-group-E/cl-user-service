@@ -8,6 +8,7 @@ import at.aau.ase.cl.util.JWT_Util;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -16,7 +17,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
-@Path("/")
+@Path("/user")
+@Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
     @Inject
     UserService service;
@@ -31,7 +33,7 @@ public class UserResource {
     }
 
     @GET
-    @Path("user/{id}")
+    @Path("/{id}")
     @APIResponse(responseCode = "200", description = "OK", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))})
     public Response getUser(@PathParam("id") UUID id) {
@@ -41,7 +43,7 @@ public class UserResource {
     }
 
     @POST
-    @Path("user/{id}/address")
+    @Path("/{id}/address")
     public Response addAddressToUser(@PathParam("id") UUID id,
                                      @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
@@ -51,7 +53,7 @@ public class UserResource {
     }
 
     @PUT
-    @Path("user/{id}/address")
+    @Path("/{id}/address")
     public Response updateAddress(@PathParam("id") UUID id,
                                   @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
@@ -61,7 +63,7 @@ public class UserResource {
     }
 
     @PUT
-    @Path("user/{id}/set-initial-login")
+    @Path("/{id}/set-initial-login")
     public Response updateInitialLoginState(@PathParam("id") UUID id) {
         var updatedUser = service.updateInitialLoginState(id);
         var resultDto = UserMapper.INSTANCE.map(updatedUser);
@@ -71,7 +73,7 @@ public class UserResource {
 
 
     @POST
-    @Path("/user/login")
+    @Path("/login")
     public Response login(@Valid LoginRequest loginRequest) {
         var user = service.findByUsernameOrEmail(loginRequest.username);
         if (user == null || !BCrypt.checkpw(loginRequest.password, user.password)) {
