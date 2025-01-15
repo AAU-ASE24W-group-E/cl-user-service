@@ -5,8 +5,8 @@ import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Test;
+import at.aau.ase.cl.api.interceptor.exceptions.NotFoundException;
 
 import java.util.UUID;
 
