@@ -1,5 +1,6 @@
 package at.aau.ase.cl.service;
 
+import at.aau.ase.cl.api.interceptor.exceptions.EmailAlreadyExistsException;
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
@@ -103,7 +104,7 @@ class UserServiceTest {
         user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createdUser));
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(createdUser));
     }
 
     @Test
