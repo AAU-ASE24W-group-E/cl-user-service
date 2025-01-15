@@ -1,5 +1,6 @@
 package at.aau.ase.cl.api;
 
+import at.aau.ase.cl.api.interceptor.InvalidPasswordException;
 import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.mapper.UserMapper;
@@ -76,8 +77,9 @@ public class UserResource {
     @Path("/login")
     public Response login(@Valid LoginRequest loginRequest) {
         var user = service.findByUsernameOrEmail(loginRequest.username);
-        if (user == null || !BCrypt.checkpw(loginRequest.password, user.password)) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build();
+
+        if (!BCrypt.checkpw(loginRequest.password, user.password)) {
+            throw new InvalidPasswordException("Invalid password for user: " + user.username);
         }
 
         String token = JWT_Util.generateToken(user.id.toString(), user.username, user.role);

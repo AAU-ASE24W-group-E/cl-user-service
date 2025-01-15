@@ -2,6 +2,7 @@ package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.api.interceptor.EmailAlreadyExistsException;
 import at.aau.ase.cl.api.interceptor.NotFoundException;
+import at.aau.ase.cl.api.interceptor.UserNotFoundException;
 import at.aau.ase.cl.api.interceptor.UsernameAlreadyExistsException;
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
@@ -88,7 +89,7 @@ public class UserService {
         UserEntity user = UserEntity.find("email = ?1 or username = ?1", identifier).firstResult();
         if (user == null) {
             Log.debugf("User with identifier %s not found", identifier);
-            throw new NotFoundException("User with identifier " + identifier + " not found");
+            throw new UserNotFoundException("User with identifier " + identifier + " not found");
         }
         Log.debugf("User with identifier %s found: %s", identifier, user);
         return user;
