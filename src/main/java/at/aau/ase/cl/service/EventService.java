@@ -20,6 +20,10 @@ public class EventService {
 
     @Transactional(Transactional.TxType.NOT_SUPPORTED)
     public void sendUserEvent(UserEntity user) {
+        if (user == null || user.id == null || user.address == null) {
+            Log.warnf("Skipping event of inconsistent model: %s", user);
+            return;
+        }
         UserEvent userEvent = new UserEvent(user.id, user.username, user.address.latitude, user.address.longitude);
         Log.debugf("Sending user event: %s", userEvent);
         userEventEmitter.send(KafkaRecord.of(userEvent.id(), userEvent)

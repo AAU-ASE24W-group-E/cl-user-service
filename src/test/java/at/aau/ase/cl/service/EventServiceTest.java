@@ -12,9 +12,10 @@ import io.smallrye.reactive.messaging.memory.InMemoryConnector;
 import io.smallrye.reactive.messaging.memory.InMemorySink;
 import jakarta.enterprise.inject.Any;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,13 +31,12 @@ class EventServiceTest {
     @Inject
     UserService userService;
 
+    @Inject
+    EventService eventService;
+
     @BeforeEach
     void setUp() {
         userEventSink = connector.sink(EventService.USER_EVENT_CHANNEL);
-    }
-
-    @AfterEach
-    void tearDown() {
         userEventSink.clear();
     }
 
@@ -69,6 +69,34 @@ class EventServiceTest {
         assertEquals(user.username, event.username());
         assertEquals(address.latitude, event.latitude());
         assertEquals(address.longitude, event.longitude());
+    }
+
+    @Test
+    void sendUserEventShouldBeSkippedForNullUser() {
+        eventService.sendUserEvent(null);
+
+        assertTrue(userEventSink.received().isEmpty());
+    }
+
+    @Test
+    void sendUserEventShouldBeSkippedForUserWithNullId() {
+        var user = createTestUserEntity();
+        user.id = null;
+
+        eventService.sendUserEvent(user);
+
+        assertTrue(userEventSink.received().isEmpty());
+    }
+
+    @Test
+    void sendUserEventShouldBeSkippedForUserWithoutAddress() {
+        var user = createTestUserEntity();
+        user.id = UUID.randomUUID();
+        user.address = null;
+
+        eventService.sendUserEvent(user);
+
+        assertTrue(userEventSink.received().isEmpty());
     }
 
     UserEntity createTestUserEntity() {
