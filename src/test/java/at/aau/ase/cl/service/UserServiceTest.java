@@ -114,7 +114,7 @@ class UserServiceTest {
         UserEntity user = new UserEntity();
         user.address = null;
         user.email = "email20";
-        user.username = "username4";
+        user.username = "username20";
         user.password = "SomePassword";
 
         userService.createUser(user);
@@ -122,7 +122,7 @@ class UserServiceTest {
         UserEntity user2 = new UserEntity();
         user2.address = null;
         user2.email = "email21";
-        user2.username = "username4";
+        user2.username = "username20";
         user2.password = "SomePassword";
 
         assertThrows(UsernameAlreadyExistsException.class, () -> userService.createUser(user2));
