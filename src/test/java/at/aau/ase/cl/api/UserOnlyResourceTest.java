@@ -1,8 +1,5 @@
 package at.aau.ase.cl.api;
 
-import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
-
 import at.aau.ase.cl.api.model.LoginRequest;
 import at.aau.ase.cl.api.model.User;
 import io.quarkus.test.junit.QuarkusTest;
@@ -10,6 +7,8 @@ import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.Is.is;
 
 @QuarkusTest

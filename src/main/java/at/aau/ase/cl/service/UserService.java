@@ -1,5 +1,9 @@
 package at.aau.ase.cl.service;
 
+import at.aau.ase.cl.api.interceptor.exceptions.EmailAlreadyExistsException;
+import at.aau.ase.cl.api.interceptor.exceptions.NotFoundException;
+import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
+import at.aau.ase.cl.api.interceptor.exceptions.UsernameAlreadyExistsException;
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
@@ -7,7 +11,6 @@ import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.UUID;
 
@@ -16,6 +19,16 @@ public class UserService {
 
     @Transactional
     public UserEntity createUser(UserEntity user) {
+        UserEntity existingEmailUser = UserEntity.find("email", user.email).firstResult();
+        if (existingEmailUser != null) {
+            throw new EmailAlreadyExistsException("A user with this email already exists: " + user.email);
+        }
+
+        UserEntity existingUsernameUser = UserEntity.find("username", user.username).firstResult();
+        if (existingUsernameUser != null) {
+            throw new UsernameAlreadyExistsException("A user with this username already exists: " + user.username);
+        }
+
         try {
             user.initialLoginPending = true;
             user.password = BcryptUtil.bcryptHash(user.password);
@@ -76,7 +89,7 @@ public class UserService {
         UserEntity user = UserEntity.find("email = ?1 or username = ?1", identifier).firstResult();
         if (user == null) {
             Log.debugf("User with identifier %s not found", identifier);
-            throw new NotFoundException("User with identifier " + identifier + " not found");
+            throw new UserNotFoundException("User with identifier " + identifier + " not found");
         }
         Log.debugf("User with identifier %s found: %s", identifier, user);
         return user;

@@ -1,11 +1,14 @@
 package at.aau.ase.cl.service;
 
+import at.aau.ase.cl.api.interceptor.exceptions.EmailAlreadyExistsException;
+import at.aau.ase.cl.api.interceptor.exceptions.NotFoundException;
+import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
+import at.aau.ase.cl.api.interceptor.exceptions.UsernameAlreadyExistsException;
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -103,7 +106,26 @@ class UserServiceTest {
         user.password = "SomePassword";
 
         UserEntity createdUser = userService.createUser(user);
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createdUser));
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(createdUser));
+    }
+
+    @Test
+    void testAddUserWithExistingUsername() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.email = "email20";
+        user.username = "username20";
+        user.password = "SomePassword";
+
+        userService.createUser(user);
+
+        UserEntity user2 = new UserEntity();
+        user2.address = null;
+        user2.email = "email21";
+        user2.username = "username20";
+        user2.password = "SomePassword";
+
+        assertThrows(UsernameAlreadyExistsException.class, () -> userService.createUser(user2));
     }
 
     @Test
@@ -122,6 +144,11 @@ class UserServiceTest {
         UserEntity updatedLoginStateUser = userService.updateInitialLoginState(createdUser.id);
         assertNotNull(updatedLoginStateUser);
         assertFalse(updatedLoginStateUser.initialLoginPending);
+    }
+
+    @Test
+    void testGetUserByUsernameOrEmailNotExist() {
+        assertThrows(UserNotFoundException.class, () -> userService.findByUsernameOrEmail("-"));
     }
 
     @Test

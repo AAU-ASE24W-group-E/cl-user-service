@@ -1,4 +1,4 @@
-package at.aau.ase.cl.api.interceptor;
+package at.aau.ase.cl.api.interceptor.mapper;
 
 import io.quarkus.test.junit.QuarkusTest;
 
