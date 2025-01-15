@@ -1,6 +1,7 @@
 package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.api.interceptor.exceptions.EmailAlreadyExistsException;
+import at.aau.ase.cl.api.interceptor.exceptions.NotFoundException;
 import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
 import at.aau.ase.cl.api.interceptor.exceptions.UsernameAlreadyExistsException;
 import at.aau.ase.cl.model.AddressEntity;
@@ -9,7 +10,6 @@ import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import at.aau.ase.cl.api.interceptor.exceptions.NotFoundException;
 
 import java.util.UUID;
 

@@ -1,7 +1,6 @@
 package at.aau.ase.cl.api.interceptor.mapper;
 
 import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
-import at.aau.ase.cl.api.interceptor.exceptions.UsernameAlreadyExistsException;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -11,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
-public class UserNotFoundExceptionMapperTest {
+class UserNotFoundExceptionMapperTest {
     @Inject
     UserNotFoundExceptionMapper mapper;
 

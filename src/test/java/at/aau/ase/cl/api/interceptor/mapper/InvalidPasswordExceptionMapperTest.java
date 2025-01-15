@@ -1,6 +1,5 @@
 package at.aau.ase.cl.api.interceptor.mapper;
 
-import at.aau.ase.cl.api.interceptor.exceptions.EmailAlreadyExistsException;
 import at.aau.ase.cl.api.interceptor.exceptions.InvalidPasswordException;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -11,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
-public class InvalidPasswordExceptionMapperTest {
+class InvalidPasswordExceptionMapperTest {
     @Inject
     InvalidPasswordExceptionMapper mapper;
 

@@ -1,7 +1,5 @@
 package at.aau.ase.cl.api;
 
-import at.aau.ase.cl.api.interceptor.exceptions.InvalidPasswordException;
-import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
 import at.aau.ase.cl.api.model.Address;
 import at.aau.ase.cl.api.model.LoginRequest;
 import at.aau.ase.cl.api.model.User;
@@ -14,7 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class UserResourceTest {
