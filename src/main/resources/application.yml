@@ -36,6 +36,18 @@ smallrye:
       key:
         location: "src/main/resources/public.pem"
 
+mp:
+  messaging:
+    outgoing:
+      user:
+        connector: "smallrye-kafka"
+        topic: "cl.user"
+
+"%prod":
+  kafka:
+    bootstrap:
+      servers: "kafka:9092"
+
 "%test":
   quarkus:
     datasource:
@@ -57,6 +69,12 @@ smallrye:
         issuer: "user-service"
         key:
           location: "src/main/resources/public.pem"
+  mp:
+    messaging:
+      outgoing:
+        user:
+          connector: "smallrye-in-memory"
+
 
 "%dev":
   quarkus:
