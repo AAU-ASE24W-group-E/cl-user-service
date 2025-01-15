@@ -1,6 +1,5 @@
-package at.aau.ase.cl.api.interceptor;
+package at.aau.ase.cl.api.interceptor.mapper;
 
-import at.aau.ase.cl.api.interceptor.mapper.IllegalArgumentExceptionMapper;
 import io.quarkus.test.junit.QuarkusTest;
 
 import jakarta.inject.Inject;
