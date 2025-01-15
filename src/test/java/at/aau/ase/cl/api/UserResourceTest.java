@@ -1,5 +1,7 @@
 package at.aau.ase.cl.api;
 
+import at.aau.ase.cl.api.interceptor.exceptions.InvalidPasswordException;
+import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
 import at.aau.ase.cl.api.model.Address;
 import at.aau.ase.cl.api.model.LoginRequest;
 import at.aau.ase.cl.api.model.User;
@@ -299,5 +301,37 @@ class UserResourceTest {
                 .path("password");
 
         assertTrue(BcryptUtil.matches("password123", hashedPassword), "Password does not match the hash");
+    }
+
+    @Test
+    void loginWithWrongPassword() {
+        User user = new User("email9@mail.com", "john9", null, "password123", "USER");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("initialLoginPending", equalTo(true))
+                .body("email", equalTo("email9@mail.com"))
+                .body("username", equalTo("john9"))
+                .body("role", equalTo("USER"))
+                .extract()
+                .path("id");
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.username = "john9";
+        loginRequest.password = "incorrectPassword";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .post("/user/login")
+                .then()
+                .statusCode(401)
+                .body("type", equalTo("InvalidPasswordException"))
+                .body("message", containsString("Invalid password for user: john9"));
     }
 }

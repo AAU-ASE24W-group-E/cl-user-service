@@ -1,6 +1,8 @@
 package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.api.interceptor.exceptions.EmailAlreadyExistsException;
+import at.aau.ase.cl.api.interceptor.exceptions.UserNotFoundException;
+import at.aau.ase.cl.api.interceptor.exceptions.UsernameAlreadyExistsException;
 import at.aau.ase.cl.model.AddressEntity;
 import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
@@ -108,6 +110,25 @@ class UserServiceTest {
     }
 
     @Test
+    void testAddUserWithExistingUsername() {
+        UserEntity user = new UserEntity();
+        user.address = null;
+        user.email = "email20";
+        user.username = "username4";
+        user.password = "SomePassword";
+
+        userService.createUser(user);
+
+        UserEntity user2 = new UserEntity();
+        user2.address = null;
+        user2.email = "email21";
+        user2.username = "username4";
+        user2.password = "SomePassword";
+
+        assertThrows(UsernameAlreadyExistsException.class, () -> userService.createUser(user2));
+    }
+
+    @Test
     void testSetLoginState() {
         UserEntity user = new UserEntity();
         user.address = null;
@@ -123,6 +144,11 @@ class UserServiceTest {
         UserEntity updatedLoginStateUser = userService.updateInitialLoginState(createdUser.id);
         assertNotNull(updatedLoginStateUser);
         assertFalse(updatedLoginStateUser.initialLoginPending);
+    }
+
+    @Test
+    void testGetUserByUsernameOrEmailNotExist() {
+        assertThrows(UserNotFoundException.class, () -> userService.findByUsernameOrEmail("-"));
     }
 
     @Test
