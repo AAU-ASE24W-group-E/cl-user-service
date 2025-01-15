@@ -1,6 +1,6 @@
 package at.aau.ase.cl.api;
 
-import at.aau.ase.cl.api.interceptor.InvalidPasswordException;
+import at.aau.ase.cl.api.interceptor.exceptions.InvalidPasswordException;
 import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.mapper.UserMapper;

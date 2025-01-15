@@ -1,4 +1,4 @@
-package at.aau.ase.cl.api.interceptor;
+package at.aau.ase.cl.api.interceptor.exceptions;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
     public UsernameAlreadyExistsException(String message) {
