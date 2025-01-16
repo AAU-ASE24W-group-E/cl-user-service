@@ -9,6 +9,7 @@ import at.aau.ase.cl.model.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 
@@ -16,6 +17,8 @@ import java.util.UUID;
 
 @ApplicationScoped
 public class UserService {
+    @Inject
+    EventService eventService;
 
     @Transactional
     public UserEntity createUser(UserEntity user) {
@@ -36,6 +39,8 @@ public class UserService {
                 user.role = "USER";
             }
             user.persistAndFlush();
+
+            eventService.sendUserEvent(user);
         } catch (PersistenceException e) {
             throw new IllegalArgumentException("A user with this identifier already exists: " + user.email, e);
         }
@@ -68,6 +73,8 @@ public class UserService {
         user.address = address;
         user.persistAndFlush();
         Log.debugf("Added address to User with id %s: %s", userId, user);
+
+        eventService.sendUserEvent(user);
         return user;
     }
 
@@ -81,6 +88,8 @@ public class UserService {
         user.persistAndFlush();
 
         Log.debugf("Updated address to User with id %s: %s", userId, user);
+
+        eventService.sendUserEvent(user);
         return user;
     }
 

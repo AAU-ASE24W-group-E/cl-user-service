@@ -30,11 +30,27 @@ smallrye:
   jwt:
     sign:
       key:
-        location: "src/main/resources/private.pem"
+        location: "classpath:private.pem"
     verify:
       issuer: "user-service"
       key:
-        location: "src/main/resources/public.pem"
+        location: "classpath:public.pem"
+
+mp:
+  messaging:
+    outgoing:
+      user:
+        connector: "smallrye-kafka"
+        topic: "cl.user"
+        key:
+          serializer: org.apache.kafka.common.serialization.UUIDSerializer
+        value:
+          serializer: io.quarkus.kafka.client.serialization.ObjectMapperSerializer
+
+"%prod":
+  kafka:
+    bootstrap:
+      servers: "kafka:9092"
 
 "%test":
   quarkus:
@@ -42,6 +58,11 @@ smallrye:
       devservices:
         enabled: true
         reuse: false
+      # uncomment to test with local database instead of devservices
+#      username: "crowd-library"
+#      password: "crowd-library"
+#      jdbc:
+#        url: "jdbc:postgresql://localhost:5432/crowd-library"
     hibernate-orm:
       database:
         generation: drop-and-create
@@ -57,6 +78,12 @@ smallrye:
         issuer: "user-service"
         key:
           location: "src/main/resources/public.pem"
+  mp:
+    messaging:
+      outgoing:
+        user:
+          connector: "smallrye-in-memory"
+
 
 "%dev":
   quarkus:
