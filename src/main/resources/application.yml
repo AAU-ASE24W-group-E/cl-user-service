@@ -42,6 +42,10 @@ mp:
       user:
         connector: "smallrye-kafka"
         topic: "cl.user"
+        key:
+          serializer: org.apache.kafka.common.serialization.UUIDSerializer
+        value:
+          serializer: io.quarkus.kafka.client.serialization.ObjectMapperSerializer
 
 "%prod":
   kafka:
