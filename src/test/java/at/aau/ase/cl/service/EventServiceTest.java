@@ -55,6 +55,23 @@ class EventServiceTest {
     }
 
     @Test
+    void addAddressShouldEmitEvent() {
+        UserEntity user = createTestUserEntity();
+        userService.createUser(user);
+
+        AddressEntity address = AddressMapper.INSTANCE.map(
+                new Address(user.address.latitude / -2, user.address.longitude / -3));
+        userService.addAddressToUser(user.id, address);
+
+        assertEquals(2, userEventSink.received().size());
+        var event = userEventSink.received().getLast().getPayload();
+        assertEquals(user.id, event.id());
+        assertEquals(user.username, event.username());
+        assertEquals(address.latitude, event.latitude());
+        assertEquals(address.longitude, event.longitude());
+    }
+
+    @Test
     void updateAddressShouldEmitEvent() {
         UserEntity user = createTestUserEntity();
         userService.createUser(user);

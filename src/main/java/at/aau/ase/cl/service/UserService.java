@@ -73,6 +73,8 @@ public class UserService {
         user.address = address;
         user.persistAndFlush();
         Log.debugf("Added address to User with id %s: %s", userId, user);
+
+        eventService.sendUserEvent(user);
         return user;
     }
 
