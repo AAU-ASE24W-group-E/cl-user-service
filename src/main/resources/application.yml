@@ -30,11 +30,11 @@ smallrye:
   jwt:
     sign:
       key:
-        location: "src/main/resources/private.pem"
+        location: "classpath:private.pem"
     verify:
       issuer: "user-service"
       key:
-        location: "src/main/resources/public.pem"
+        location: "classpath:public.pem"
 
 mp:
   messaging:
