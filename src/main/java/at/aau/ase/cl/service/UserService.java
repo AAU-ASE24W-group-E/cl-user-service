@@ -103,4 +103,33 @@ public class UserService {
         Log.debugf("User with identifier %s found: %s", identifier, user);
         return user;
     }
+
+    @Transactional
+    public UserEntity updateUserInfo(UUID id, String email, String username) {
+        UserEntity user = getUserById(id);
+
+        try {
+            user.email = email;
+            user.username = username;
+            user.persistAndFlush();
+        } catch (PersistenceException e) {
+            throw new IllegalArgumentException("A user with this identifier already exists: " + id, e);
+        }
+
+
+        return user;
+    }
+
+    @Transactional
+    public UserEntity updatePassword(UUID id, String newPassword) {
+        UserEntity user = getUserById(id);
+
+        user.password = newPassword;
+
+        user.persistAndFlush();
+
+        Log.debugf("Updated password to User with id %s: %s", id, user);
+
+        return user;
+    }
 }

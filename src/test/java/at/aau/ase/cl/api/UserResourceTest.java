@@ -1,8 +1,6 @@
 package at.aau.ase.cl.api;
 
-import at.aau.ase.cl.api.model.Address;
-import at.aau.ase.cl.api.model.LoginRequest;
-import at.aau.ase.cl.api.model.User;
+import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.util.JWT_Util;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
@@ -333,4 +331,138 @@ class UserResourceTest {
                 .body("type", equalTo("InvalidPasswordException"))
                 .body("message", containsString("Invalid password for user: john9"));
     }
+
+    @Test
+    void updateUserInfoSuccessfully() {
+        User user = new User("email10@mail.com", "john10", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        UserPayload updatedUserInfo = new UserPayload();
+        updatedUserInfo.email = "new-email@mail.com";
+        updatedUserInfo.username = "new-username";
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("id", userId)
+                .body(updatedUserInfo)
+                .put("/user/{id}")
+                .then()
+                .statusCode(200)
+                .log().body(true)
+                .body("email", equalTo("new-email@mail.com"))
+                .body("username", equalTo("new-username"));
+    }
+
+    @Test
+    void updateUserInfoConflict() {
+        User user1 = new User("email11@mail.com", "john11", null, "password123", "USER");
+        User user2 = new User("email12@mail.com", "john12", null, "password123", "USER");
+
+        String user1Id = given()
+                .contentType(ContentType.JSON)
+                .body(user1)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(user2)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        UserPayload conflictUserInfo = new UserPayload();
+        conflictUserInfo.email = "email12@mail.com";
+        conflictUserInfo.username = "new-username";
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("id", user1Id)
+                .body(conflictUserInfo)
+                .put("/user/{id}")
+                .then();
+    }
+
+
+    @Test
+    void updatePasswordSuccessfully() {
+        User user = new User("email13@mail.com", "john13", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        PasswordPayload passwordPayload = new PasswordPayload();
+        passwordPayload.oldPassword = "password123";
+        passwordPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("id", userId)
+                .body(passwordPayload)
+                .put("/user/{id}/password")
+                .then()
+                .statusCode(200);
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.username = "john13";
+        loginRequest.password = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .post("/user/login")
+                .then()
+                .statusCode(200)
+                .body("token", notNullValue());
+    }
+
+    @Test
+    void updatePasswordInvalidOldPassword() {
+        User user = new User("email14@mail.com", "john14", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        PasswordPayload passwordPayload = new PasswordPayload();
+        passwordPayload.oldPassword = "wrongOldPassword";
+        passwordPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("id", userId)
+                .body(passwordPayload)
+                .put("/user/{id}/password")
+                .then()
+                .statusCode(401)
+                .body("type", equalTo("InvalidPasswordException"))
+                .body("message", containsString("Invalid old password for user"));
+    }
+
+
+
 }

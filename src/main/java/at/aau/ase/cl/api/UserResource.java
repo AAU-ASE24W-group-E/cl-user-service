@@ -43,6 +43,29 @@ public class UserResource {
         return Response.ok(result).build();
     }
 
+    @PUT
+    @Path("/{id}")
+    public Response updateUserInfo(@PathParam("id") UUID id, @Valid UserPayload userPayload) {
+        var updatedUser = service.updateUserInfo(id, userPayload.email, userPayload.username);
+        var resultDto = UserMapper.INSTANCE.map(updatedUser);
+        return Response.ok(resultDto).build();
+    }
+
+    @PUT
+    @Path("/{id}/password")
+    public Response updatePassword(@PathParam("id") UUID id, @Valid PasswordPayload passwordPayload) {
+        var user = service.getUserById(id);
+
+        if (!BCrypt.checkpw(passwordPayload.oldPassword, user.password)) {
+            throw new InvalidPasswordException("Invalid old password for user: " + user.username);
+        }
+
+        String hashedNewPassword = BCrypt.hashpw(passwordPayload.newPassword, BCrypt.gensalt());
+        var updatedUser = service.updatePassword(id, hashedNewPassword);
+        var resultDto = UserMapper.INSTANCE.map(updatedUser);
+        return Response.ok(resultDto).build();
+    }
+
     @POST
     @Path("/{id}/address")
     public Response addAddressToUser(@PathParam("id") UUID id,
