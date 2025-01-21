@@ -26,6 +26,12 @@ quarkus:
   container-image:
     group: "AAU-ASE24W-group-E"
 
+  mailer:
+    from: "noreply@crowdlibrary.com"
+    host: "localhost"
+    port: 1025
+    tls: false
+
 smallrye:
   jwt:
     sign:
@@ -59,10 +65,10 @@ mp:
         enabled: true
         reuse: false
       # uncomment to test with local database instead of devservices
-#      username: "crowd-library"
-#      password: "crowd-library"
-#      jdbc:
-#        url: "jdbc:postgresql://localhost:5432/crowd-library"
+    #      username: "crowd-library"
+    #      password: "crowd-library"
+    #      jdbc:
+    #        url: "jdbc:postgresql://localhost:5432/crowd-library"
     hibernate-orm:
       database:
         generation: drop-and-create
@@ -84,7 +90,6 @@ mp:
         user:
           connector: "smallrye-in-memory"
 
-
 "%dev":
   quarkus:
     datasource:
@@ -94,6 +99,11 @@ mp:
     hibernate-orm:
       database:
         generation: drop-and-create
+    mailer:
+      from: "dev@crowdlibrary.com"
+      host: "localhost"
+      port: 1025
+      tls: false
   smallrye:
     jwt:
       sign:

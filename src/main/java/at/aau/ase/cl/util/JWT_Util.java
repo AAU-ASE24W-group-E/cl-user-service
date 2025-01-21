@@ -21,7 +21,8 @@ public class JWT_Util {
                 .groups(new HashSet<>(Arrays.asList("USER")))
                 .claim("role", role)
                 .claim("username", username)
-                .expiresAt(System.currentTimeMillis() / 1000 + 3600)
+//                .expiresAt(System.currentTimeMillis() / 1000 + 3600)
+                .expiresAt(System.currentTimeMillis() / 1000 + 86400)
                 .sign();
     }
 

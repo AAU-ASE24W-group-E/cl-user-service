@@ -4,8 +4,11 @@ import at.aau.ase.cl.api.interceptor.exceptions.InvalidPasswordException;
 import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.mapper.AddressMapper;
 import at.aau.ase.cl.mapper.UserMapper;
+import at.aau.ase.cl.service.ResetPasswordService;
 import at.aau.ase.cl.service.UserService;
 import at.aau.ase.cl.util.JWT_Util;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -15,14 +18,23 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
+    private static final Logger log = LoggerFactory.getLogger(UserResource.class);
     @Inject
     UserService service;
+
+    @Inject
+    ResetPasswordService resetPasswordService;
+
+    @Inject
+    Mailer mailer;
 
     @POST
     @Path("/")
@@ -109,4 +121,59 @@ public class UserResource {
         User userDto = UserMapper.INSTANCE.map(user);
         return Response.ok(new LoginResponse(token, userDto)).build();
     }
+
+    @POST
+    @Path("/forgot-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response forgotPassword(UserEmailPayload payload) {
+        String email = payload.email;
+        System.out.println(email);
+        if (email == null || email.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Email cannot be null or empty").build();
+        }
+
+        var user = service.findByUsernameOrEmail(email);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        }
+
+        UUID resetToken = UUID.randomUUID();
+        resetPasswordService.savePasswordResetToken(user.id, resetToken);
+
+        String resetLink = "http://localhost:8080/user/reset-password?token=" + resetToken;
+        mailer.send(Mail.withText(
+                email,
+                "Password Reset Request",
+                "Click the link to reset your Crowd Library Password: " + resetLink
+        ));
+
+        return Response.ok("Password reset email sent").build();
+    }
+
+
+    @POST
+    @Path("/reset-password")
+    public Response resetPassword(@QueryParam("token") String token, @QueryParam("newPassword") String newPassword) {
+        if (token == null || token.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Token cannot be null or empty").build();
+        }
+
+        var resetTokenEntity = resetPasswordService.getResetPasswordEntityByToken(token);
+        if (resetTokenEntity == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid or expired token").build();
+        }
+
+        var user = service.getUserById(resetTokenEntity.userId);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        }
+
+        String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        service.updatePassword(user.id, hashedNewPassword);
+
+        resetPasswordService.invalidateToken(resetTokenEntity);
+
+        return Response.ok("Password reset successfully").build();
+    }
+
 }
