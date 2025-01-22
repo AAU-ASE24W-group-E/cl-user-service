@@ -48,6 +48,7 @@ public class ResetPasswordService {
 
     @Transactional
     public void invalidateToken(ResetPasswordEntity resetPasswordEntity) {
-        entityManager.remove(resetPasswordEntity);
+        ResetPasswordEntity managedEntity = entityManager.merge(resetPasswordEntity);
+        entityManager.remove(managedEntity);
     }
 }

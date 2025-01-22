@@ -139,6 +139,7 @@ public class UserResource {
 
         UUID resetToken = UUID.randomUUID();
         resetPasswordService.savePasswordResetToken(user.id, resetToken);
+        System.out.println(resetToken);
 
         String resetLink = "http://localhost:8080/user/reset-password?token=" + resetToken;
         mailer.send(Mail.withText(
@@ -153,12 +154,15 @@ public class UserResource {
 
     @POST
     @Path("/reset-password")
-    public Response resetPassword(@QueryParam("token") String token, @QueryParam("newPassword") String newPassword) {
-        if (token == null || token.isEmpty()) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response resetPassword(ResetPasswordPayload payload) {
+        System.out.println(payload.token);
+        System.out.println(payload.newPassword);
+        if (payload.token == null || payload.token.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Token cannot be null or empty").build();
         }
 
-        var resetTokenEntity = resetPasswordService.getResetPasswordEntityByToken(token);
+        var resetTokenEntity = resetPasswordService.getResetPasswordEntityByToken(payload.token);
         if (resetTokenEntity == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid or expired token").build();
         }
@@ -168,12 +172,11 @@ public class UserResource {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
         }
 
-        String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        String hashedNewPassword = BCrypt.hashpw(payload.newPassword, BCrypt.gensalt());
         service.updatePassword(user.id, hashedNewPassword);
 
         resetPasswordService.invalidateToken(resetTokenEntity);
 
         return Response.ok("Password reset successfully").build();
     }
-
 }

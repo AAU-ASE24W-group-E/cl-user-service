@@ -1,12 +1,15 @@
 package at.aau.ase.cl.api;
 
 import at.aau.ase.cl.api.model.*;
+import at.aau.ase.cl.service.ResetPasswordService;
 import at.aau.ase.cl.util.JWT_Util;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
@@ -17,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserResourceTest {
     @Inject
     JWT_Util jwtUtil;
+
+    @Inject
+    ResetPasswordService resetPasswordService;
 
     @Test
     void createUserWithoutAddress() {
@@ -463,6 +469,140 @@ class UserResourceTest {
                 .body("message", containsString("Invalid old password for user"));
     }
 
+    @Test
+    void forgotPasswordSuccessfully() {
+        User user = new User("testuser@mail.com", "testuser", null, "password123", "USER");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200);
+
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "testuser@mail.com";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(200)
+                .body(equalTo("Password reset email sent"));
+    }
+
+    @Test
+    void forgotPasswordInvalidEmail() {
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(400)
+                .body(equalTo("Email cannot be null or empty"));
+    }
+
+    @Test
+    void forgotPasswordUserNotFound() {
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "nonexistentuser@mail.com";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("User with identifier nonexistentuser@mail.com not found"));
+    }
+
+    @Test
+    void resetPasswordSuccessfully() {
+        User user = new User("testreset@mail.com", "resetuser", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "testreset@mail.com";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(200);
+
+
+        UUID token = UUID.randomUUID();
+
+        resetPasswordService.savePasswordResetToken(UUID.fromString(userId), token);
+
+        ResetPasswordPayload resetPayload = new ResetPasswordPayload();
+        resetPayload.token = token.toString();
+        resetPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(resetPayload)
+                .post("/user/reset-password")
+                .then()
+                .statusCode(200)
+                .body(equalTo("Password reset successfully"));
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.username = "resetuser";
+        loginRequest.password = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .post("/user/login")
+                .then()
+                .statusCode(200)
+                .body("token", notNullValue());
+    }
+
+    @Test
+    void resetPasswordInvalidToken() {
+        ResetPasswordPayload resetPayload = new ResetPasswordPayload();
+        resetPayload.token = UUID.randomUUID().toString();
+        resetPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(resetPayload)
+                .post("/user/reset-password")
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("Reset Token "+ resetPayload.token + " not found or used"));
+
+    }
+
+    @Test
+    void resetPasswordEmptyToken() {
+        ResetPasswordPayload resetPayload = new ResetPasswordPayload();
+        resetPayload.token = "";
+        resetPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(resetPayload)
+                .post("/user/reset-password")
+                .then()
+                .statusCode(400)
+                .body(equalTo("Token cannot be null or empty"));
+    }
 
 
 }
