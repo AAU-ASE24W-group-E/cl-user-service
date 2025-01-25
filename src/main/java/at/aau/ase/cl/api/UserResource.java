@@ -7,7 +7,6 @@ import at.aau.ase.cl.mapper.UserMapper;
 import at.aau.ase.cl.service.ResetPasswordService;
 import at.aau.ase.cl.service.UserService;
 import at.aau.ase.cl.util.JWT_Util;
-import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -20,7 +19,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.mindrot.jbcrypt.BCrypt;
 import io.quarkus.logging.Log;
 
-import java.util.List;
 import java.util.UUID;
 
 @Path("/user")
@@ -32,8 +30,6 @@ public class UserResource {
     @Inject
     ResetPasswordService resetPasswordService;
 
-    @Inject
-    Mailer mailer;
 
     @POST
     @Path("/")

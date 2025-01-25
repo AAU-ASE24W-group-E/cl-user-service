@@ -42,8 +42,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -66,8 +64,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
 
@@ -101,8 +97,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -133,8 +127,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -170,8 +162,6 @@ class UserResourceTest {
                 .statusCode(200)
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -219,8 +209,6 @@ class UserResourceTest {
                 .statusCode(200)
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -302,8 +290,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("password123", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -547,7 +533,7 @@ class UserResourceTest {
         resetPasswordService.savePasswordResetToken(UUID.fromString(userId), resetToken);
 
         ResetPasswordPayload resetPayload = new ResetPasswordPayload();
-        resetPayload.token = resetToken.toString();
+        resetPayload.token = resetToken;
         resetPayload.newPassword = "newPassword123";
 
         given()

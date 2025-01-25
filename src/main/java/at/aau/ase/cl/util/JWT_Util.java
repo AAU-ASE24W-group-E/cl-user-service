@@ -6,8 +6,6 @@ import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 @ApplicationScoped
