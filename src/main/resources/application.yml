@@ -1,9 +1,9 @@
 quarkus:
-  mailer:
-    from: "noreply@crowdlibrary.com"
-    host: "smtp.freesmtpservers.com"
-    port: 25
-    tls: false
+#  mailer:
+#    from: "noreply@crowdlibrary.com"
+#    host: "smtp.freesmtpservers.com"
+#    port: 25
+#    tls: false
   datasource:
     db-kind: "postgresql"
   hibernate-orm:
@@ -60,11 +60,11 @@ mp:
 
 "%test":
   quarkus:
-    mailer:
-      from: "noreply@crowdlibrary.com"
-      host: "smtp.freesmtpservers.com"
-      port: 25
-      tls: false
+#    mailer:
+#      from: "noreply@crowdlibrary.com"
+#      host: "smtp.freesmtpservers.com"
+#      port: 25
+#      tls: false
     datasource:
       devservices:
         enabled: true
@@ -104,11 +104,11 @@ mp:
     hibernate-orm:
       database:
         generation: drop-and-create
-    mailer:
-      from: "noreply@crowdlibrary.com"
-      host: "smtp.freesmtpservers.com"
-      port: 25
-      tls: false
+#    mailer:
+#      from: "noreply@crowdlibrary.com"
+#      host: "smtp.freesmtpservers.com"
+#      port: 25
+#      tls: false
   smallrye:
     jwt:
       sign:
