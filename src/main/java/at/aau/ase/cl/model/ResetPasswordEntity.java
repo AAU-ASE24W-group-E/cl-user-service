@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "reset_password_tokens")
+@Table(name = "user_reset_password_tokens")
 public class ResetPasswordEntity extends PanacheEntityBase {
 
     @Id
@@ -17,16 +17,10 @@ public class ResetPasswordEntity extends PanacheEntityBase {
     public UUID userId;
 
     @Column(name = "reset_token", nullable = false, unique = true)
-    public UUID token;
+    public String token;
 
-    @Column(name = "used", nullable = false)
-    public boolean used = false;
-
-    public static ResetPasswordEntity findUnusedTokenByUserId(UUID userId) {
-        return find("userId = ?1 and used = false", userId).firstResult();
-    }
 
     public static ResetPasswordEntity findByToken(String token) {
-        return find("token = ?1 and used = false", UUID.fromString(token)).firstResult();
+        return find("token = ?1", token).firstResult();
     }
 }

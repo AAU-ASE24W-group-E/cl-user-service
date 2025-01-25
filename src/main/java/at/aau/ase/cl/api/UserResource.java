@@ -18,15 +18,14 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.quarkus.logging.Log;
 
+import java.util.List;
 import java.util.UUID;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
-    private static final Logger log = LoggerFactory.getLogger(UserResource.class);
     @Inject
     UserService service;
 
@@ -41,7 +40,7 @@ public class UserResource {
     public Response createUser(User user) {
         var model = UserMapper.INSTANCE.map(user);
         model = service.createUser(model);
-        var result = UserMapper.INSTANCE.map(model);
+        var result = UserMapper.INSTANCE.mapWithoutPassword(model);
         return Response.ok(result).build();
     }
 
@@ -51,7 +50,7 @@ public class UserResource {
             @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))})
     public Response getUser(@PathParam("id") UUID id) {
         var model = service.getUserById(id);
-        var result = UserMapper.INSTANCE.map(model);
+        var result = UserMapper.INSTANCE.mapWithoutPassword(model);
         return Response.ok(result).build();
     }
 
@@ -59,7 +58,7 @@ public class UserResource {
     @Path("/{id}")
     public Response updateUserInfo(@PathParam("id") UUID id, @Valid UserPayload userPayload) {
         var updatedUser = service.updateUserInfo(id, userPayload.email, userPayload.username);
-        var resultDto = UserMapper.INSTANCE.map(updatedUser);
+        var resultDto = UserMapper.INSTANCE.mapWithoutPassword(updatedUser);
         return Response.ok(resultDto).build();
     }
 
@@ -74,7 +73,7 @@ public class UserResource {
 
         String hashedNewPassword = BCrypt.hashpw(passwordPayload.newPassword, BCrypt.gensalt());
         var updatedUser = service.updatePassword(id, hashedNewPassword);
-        var resultDto = UserMapper.INSTANCE.map(updatedUser);
+        var resultDto = UserMapper.INSTANCE.mapWithoutPassword(updatedUser);
         return Response.ok(resultDto).build();
     }
 
@@ -84,7 +83,7 @@ public class UserResource {
                                      @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
         var modelUser = service.addAddressToUser(id, modelAddress);
-        var result = UserMapper.INSTANCE.map(modelUser);
+        var result = UserMapper.INSTANCE.mapWithoutPassword(modelUser);
         return Response.ok(result).build();
     }
 
@@ -94,7 +93,7 @@ public class UserResource {
                                   @Valid Address address) {
         var modelAddress = AddressMapper.INSTANCE.map(address);
         var modelUser = service.updateAddress(id, modelAddress);
-        var result = UserMapper.INSTANCE.map(modelUser);
+        var result = UserMapper.INSTANCE.mapWithoutPassword(modelUser);
         return Response.ok(result).build();
     }
 
@@ -102,7 +101,7 @@ public class UserResource {
     @Path("/{id}/set-initial-login")
     public Response updateInitialLoginState(@PathParam("id") UUID id) {
         var updatedUser = service.updateInitialLoginState(id);
-        var resultDto = UserMapper.INSTANCE.map(updatedUser);
+        var resultDto = UserMapper.INSTANCE.mapWithoutPassword(updatedUser);
 
         return Response.ok(resultDto).build();
     }
@@ -118,7 +117,7 @@ public class UserResource {
         }
 
         String token = JWT_Util.generateToken(user.id.toString(), user.username, user.role);
-        User userDto = UserMapper.INSTANCE.map(user);
+        User userDto = UserMapper.INSTANCE.mapWithoutPassword(user);
         return Response.ok(new LoginResponse(token, userDto)).build();
     }
 
@@ -126,57 +125,25 @@ public class UserResource {
     @Path("/forgot-password")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response forgotPassword(UserEmailPayload payload) {
-        String email = payload.email;
-        System.out.println(email);
-        if (email == null || email.isEmpty()) {
+        if (payload.email == null || payload.email.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Email cannot be null or empty").build();
         }
 
-        var user = service.findByUsernameOrEmail(email);
-        if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
-        }
-
-        UUID resetToken = UUID.randomUUID();
-        resetPasswordService.savePasswordResetToken(user.id, resetToken);
-        System.out.println(resetToken);
-
-        String resetLink = "http://localhost:8080/user/reset-password?token=" + resetToken;
-        mailer.send(Mail.withText(
-                email,
-                "Password Reset Request",
-                "Click the link to reset your Crowd Library Password: " + resetLink
-        ));
-
+        resetPasswordService.initiatePasswordReset(payload.email);
         return Response.ok("Password reset email sent").build();
     }
-
 
     @POST
     @Path("/reset-password")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response resetPassword(ResetPasswordPayload payload) {
-        System.out.println(payload.token);
-        System.out.println(payload.newPassword);
         if (payload.token == null || payload.token.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Token cannot be null or empty").build();
         }
 
-        var resetTokenEntity = resetPasswordService.getResetPasswordEntityByToken(payload.token);
-        if (resetTokenEntity == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid or expired token").build();
-        }
+        Log.info(payload.token);
 
-        var user = service.getUserById(resetTokenEntity.userId);
-        if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
-        }
-
-        String hashedNewPassword = BCrypt.hashpw(payload.newPassword, BCrypt.gensalt());
-        service.updatePassword(user.id, hashedNewPassword);
-
-        resetPasswordService.invalidateToken(resetTokenEntity);
-
+        resetPasswordService.resetPassword(payload.token, payload.newPassword);
         return Response.ok("Password reset successfully").build();
     }
 }

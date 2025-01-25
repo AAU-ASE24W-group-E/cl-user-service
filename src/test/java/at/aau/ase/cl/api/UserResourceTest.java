@@ -543,13 +543,11 @@ class UserResourceTest {
                 .then()
                 .statusCode(200);
 
-
-        UUID token = UUID.randomUUID();
-
-        resetPasswordService.savePasswordResetToken(UUID.fromString(userId), token);
+        String resetToken = UUID.randomUUID().toString();
+        resetPasswordService.savePasswordResetToken(UUID.fromString(userId), resetToken);
 
         ResetPasswordPayload resetPayload = new ResetPasswordPayload();
-        resetPayload.token = token.toString();
+        resetPayload.token = resetToken.toString();
         resetPayload.newPassword = "newPassword123";
 
         given()
@@ -585,8 +583,7 @@ class UserResourceTest {
                 .post("/user/reset-password")
                 .then()
                 .statusCode(404)
-                .body("message", equalTo("Reset Token "+ resetPayload.token + " not found or used"));
-
+                .body("message", equalTo("Reset token not found or already used"));
     }
 
     @Test
@@ -603,6 +600,4 @@ class UserResourceTest {
                 .statusCode(400)
                 .body(equalTo("Token cannot be null or empty"));
     }
-
-
 }
