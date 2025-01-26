@@ -2,12 +2,13 @@ package at.aau.ase.cl.service;
 
 import at.aau.ase.cl.api.interceptor.exceptions.NotFoundException;
 import at.aau.ase.cl.model.ResetPasswordEntity;
+import at.aau.ase.cl.util.JWT_Util;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.mindrot.jbcrypt.BCrypt;
+import jakarta.ws.rs.InternalServerErrorException;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,10 +50,10 @@ public class ResetPasswordService {
 
         var user = userService.getUserById(resetTokenEntity.userId);
         if (user == null) {
-            throw new NotFoundException("User not found");
+            throw new InternalServerErrorException("User not found");
         }
 
-        String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        String hashedNewPassword = JWT_Util.hashPassword(newPassword);
         userService.updatePassword(user.id, hashedNewPassword);
 
         invalidateToken(token);

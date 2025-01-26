@@ -12,19 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Disabled("learning test")
 @QuarkusTest
-public class MailhogConfigTest {
+class MailhogConfigTest {
 
     @Inject
     Mailer mailer;
 
     @Test
-    public void testMailhogConfiguration() {
-        assertDoesNotThrow(() -> {
-            mailer.send(Mail.withText(
-                    "test@example.com",
-                    "Test Email",
-                    "This is a test email to verify MailHog configuration."
-            ));
-        }, "The email sending through MailHog configuration failed.");
+    void testMailhogConfiguration() {
+        assertDoesNotThrow(() -> mailer.send(Mail.withText(
+                "test@example.com",
+                "Test Email",
+                "This is a test email to verify MailHog configuration."
+        )), "The email sending through MailHog configuration failed.");
     }
 }

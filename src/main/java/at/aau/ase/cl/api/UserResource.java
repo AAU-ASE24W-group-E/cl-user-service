@@ -7,7 +7,6 @@ import at.aau.ase.cl.mapper.UserMapper;
 import at.aau.ase.cl.service.ResetPasswordService;
 import at.aau.ase.cl.service.UserService;
 import at.aau.ase.cl.util.JWT_Util;
-import io.quarkus.mailer.Mailer;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -16,7 +15,6 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.mindrot.jbcrypt.BCrypt;
 import io.quarkus.logging.Log;
 
 import java.util.UUID;
@@ -63,11 +61,11 @@ public class UserResource {
     public Response updatePassword(@PathParam("id") UUID id, @Valid PasswordPayload passwordPayload) {
         var user = service.getUserById(id);
 
-        if (!BCrypt.checkpw(passwordPayload.oldPassword, user.password)) {
+        if (!JWT_Util.checkPassword(passwordPayload.oldPassword, user.password)) {
             throw new InvalidPasswordException("Invalid old password for user: " + user.username);
         }
 
-        String hashedNewPassword = BCrypt.hashpw(passwordPayload.newPassword, BCrypt.gensalt());
+        String hashedNewPassword = JWT_Util.hashPassword(passwordPayload.newPassword);
         var updatedUser = service.updatePassword(id, hashedNewPassword);
         var resultDto = UserMapper.INSTANCE.mapWithoutPassword(updatedUser);
         return Response.ok(resultDto).build();
@@ -108,7 +106,7 @@ public class UserResource {
     public Response login(@Valid LoginRequest loginRequest) {
         var user = service.findByUsernameOrEmail(loginRequest.username);
 
-        if (!BCrypt.checkpw(loginRequest.password, user.password)) {
+        if (!JWT_Util.checkPassword(loginRequest.password, user.password)) {
             throw new InvalidPasswordException("Invalid password for user: " + user.username);
         }
 

@@ -14,6 +14,4 @@ public interface UserMapper {
 
     @Mapping(target = "password", ignore = true)
     User mapWithoutPassword(UserEntity userEntity);
-
-    User map(UserEntity userEntity);
 }
