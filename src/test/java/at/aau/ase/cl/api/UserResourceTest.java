@@ -3,7 +3,6 @@ package at.aau.ase.cl.api;
 import at.aau.ase.cl.api.model.*;
 import at.aau.ase.cl.service.ResetPasswordService;
 import at.aau.ase.cl.util.JWT_Util;
-import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
@@ -28,7 +27,7 @@ class UserResourceTest {
     void createUserWithoutAddress() {
         User user = new User("email1@mail.com", "john1", null, "SomePassword", "USER");
 
-        String hashedPassword = given()
+        given()
                 .contentType(ContentType.JSON)
                 .body(user)
                 .post("/user")
@@ -49,7 +48,7 @@ class UserResourceTest {
         Address address = new Address(49.21303, 20.49321);
         User user = new User("email2@mail.com", "john2", address, "SomePassword", "USER");
 
-        String hashedPassword = given()
+        given()
                 .contentType(ContentType.JSON)
                 .body(user)
                 .post("/user")
@@ -81,7 +80,7 @@ class UserResourceTest {
                 .extract()
                 .path("id");
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .body(user)
@@ -112,7 +111,7 @@ class UserResourceTest {
                 .extract()
                 .path("id");
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .body(user)
@@ -154,7 +153,7 @@ class UserResourceTest {
                 .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"));
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .get("/user/{id}")
@@ -201,7 +200,7 @@ class UserResourceTest {
                 .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"));
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .get("/user/{id}")
@@ -278,7 +277,7 @@ class UserResourceTest {
                 .extract()
                 .path("id");
 
-        String hashedPassword = given()
+        given()
                 .contentType(ContentType.JSON)
                 .get("/user/" + userId)
                 .then()
