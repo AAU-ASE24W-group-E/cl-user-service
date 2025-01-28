@@ -60,6 +60,9 @@ mp:
 
 "%test":
   quarkus:
+    mailer:
+      host: "localhost"
+      port: 1025
     datasource:
       devservices:
         enabled: true
@@ -92,6 +95,9 @@ mp:
 
 "%dev":
   quarkus:
+    mailer:
+      host: "localhost"
+      port: 1025
     datasource:
       devservices:
         enabled: true
