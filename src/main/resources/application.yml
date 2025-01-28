@@ -1,4 +1,9 @@
 quarkus:
+  mailer:
+    from: "noreply@crowdlibrary.com"
+    host: "mailpit"
+    port: 1025
+    tls: false
   datasource:
     db-kind: "postgresql"
   hibernate-orm:
@@ -25,6 +30,7 @@ quarkus:
   # see https://quarkus.io/guides/container-image#customizing
   container-image:
     group: "AAU-ASE24W-group-E"
+
 
 smallrye:
   jwt:
@@ -54,15 +60,18 @@ mp:
 
 "%test":
   quarkus:
+    mailer:
+      host: "localhost"
+      port: 1025
     datasource:
       devservices:
         enabled: true
         reuse: false
       # uncomment to test with local database instead of devservices
-#      username: "crowd-library"
-#      password: "crowd-library"
-#      jdbc:
-#        url: "jdbc:postgresql://localhost:5432/crowd-library"
+    #      username: "crowd-library"
+    #      password: "crowd-library"
+    #      jdbc:
+    #        url: "jdbc:postgresql://localhost:5432/crowd-library"
     hibernate-orm:
       database:
         generation: drop-and-create
@@ -84,9 +93,11 @@ mp:
         user:
           connector: "smallrye-in-memory"
 
-
 "%dev":
   quarkus:
+    mailer:
+      host: "localhost"
+      port: 1025
     datasource:
       devservices:
         enabled: true

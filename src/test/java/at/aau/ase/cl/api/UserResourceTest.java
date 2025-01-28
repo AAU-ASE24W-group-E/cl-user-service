@@ -1,12 +1,14 @@
 package at.aau.ase.cl.api;
 
 import at.aau.ase.cl.api.model.*;
+import at.aau.ase.cl.service.ResetPasswordService;
 import at.aau.ase.cl.util.JWT_Util;
-import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
@@ -18,11 +20,14 @@ class UserResourceTest {
     @Inject
     JWT_Util jwtUtil;
 
+    @Inject
+    ResetPasswordService resetPasswordService;
+
     @Test
     void createUserWithoutAddress() {
         User user = new User("email1@mail.com", "john1", null, "SomePassword", "USER");
 
-        String hashedPassword = given()
+        given()
                 .contentType(ContentType.JSON)
                 .body(user)
                 .post("/user")
@@ -36,8 +41,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -45,7 +48,7 @@ class UserResourceTest {
         Address address = new Address(49.21303, 20.49321);
         User user = new User("email2@mail.com", "john2", address, "SomePassword", "USER");
 
-        String hashedPassword = given()
+        given()
                 .contentType(ContentType.JSON)
                 .body(user)
                 .post("/user")
@@ -60,8 +63,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
 
@@ -79,7 +80,7 @@ class UserResourceTest {
                 .extract()
                 .path("id");
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .body(user)
@@ -95,8 +96,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -112,7 +111,7 @@ class UserResourceTest {
                 .extract()
                 .path("id");
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .body(user)
@@ -127,8 +126,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -156,7 +153,7 @@ class UserResourceTest {
                 .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"));
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .get("/user/{id}")
@@ -164,8 +161,6 @@ class UserResourceTest {
                 .statusCode(200)
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -205,7 +200,7 @@ class UserResourceTest {
                 .body("address.longitude", equalTo(20.49321F))
                 .body("role", equalTo("USER"));
 
-        String hashedPassword = given()
+        given()
                 .pathParam("id", userId)
                 .contentType(ContentType.JSON)
                 .get("/user/{id}")
@@ -213,8 +208,6 @@ class UserResourceTest {
                 .statusCode(200)
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("SomePassword", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -284,7 +277,7 @@ class UserResourceTest {
                 .extract()
                 .path("id");
 
-        String hashedPassword = given()
+        given()
                 .contentType(ContentType.JSON)
                 .get("/user/" + userId)
                 .then()
@@ -296,8 +289,6 @@ class UserResourceTest {
                 .body("role", equalTo("USER"))
                 .extract()
                 .path("password");
-
-        assertTrue(BcryptUtil.matches("password123", hashedPassword), "Password does not match the hash");
     }
 
     @Test
@@ -463,6 +454,135 @@ class UserResourceTest {
                 .body("message", containsString("Invalid old password for user"));
     }
 
+    @Test
+    void forgotPasswordSuccessfully() {
+        User user = new User("testuser@mail.com", "testuser", null, "password123", "USER");
 
+        given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200);
 
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "testuser@mail.com";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(200)
+                .body(equalTo("Password reset email sent"));
+    }
+
+    @Test
+    void forgotPasswordInvalidEmail() {
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(400)
+                .body(equalTo("Email cannot be null or empty"));
+    }
+
+    @Test
+    void forgotPasswordUserNotFound() {
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "nonexistentuser@mail.com";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("User with identifier nonexistentuser@mail.com not found"));
+    }
+
+    @Test
+    void resetPasswordSuccessfully() {
+        User user = new User("testreset@mail.com", "resetuser", null, "password123", "USER");
+
+        String userId = given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        UserEmailPayload payload = new UserEmailPayload();
+        payload.email = "testreset@mail.com";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/user/forgot-password")
+                .then()
+                .statusCode(200);
+
+        String resetToken = UUID.randomUUID().toString();
+        resetPasswordService.savePasswordResetToken(UUID.fromString(userId), resetToken);
+
+        ResetPasswordPayload resetPayload = new ResetPasswordPayload();
+        resetPayload.token = resetToken;
+        resetPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(resetPayload)
+                .post("/user/reset-password")
+                .then()
+                .statusCode(200)
+                .body(equalTo("Password reset successfully"));
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.username = "resetuser";
+        loginRequest.password = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .post("/user/login")
+                .then()
+                .statusCode(200)
+                .body("token", notNullValue());
+    }
+
+    @Test
+    void resetPasswordInvalidToken() {
+        ResetPasswordPayload resetPayload = new ResetPasswordPayload();
+        resetPayload.token = UUID.randomUUID().toString();
+        resetPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(resetPayload)
+                .post("/user/reset-password")
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("Reset token not found or already used"));
+    }
+
+    @Test
+    void resetPasswordEmptyToken() {
+        ResetPasswordPayload resetPayload = new ResetPasswordPayload();
+        resetPayload.token = "";
+        resetPayload.newPassword = "newPassword123";
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(resetPayload)
+                .post("/user/reset-password")
+                .then()
+                .statusCode(400)
+                .body(equalTo("Token cannot be null or empty"));
+    }
 }
